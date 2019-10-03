@@ -2,10 +2,6 @@ import * as React from "react";
 import * as ReactDOM from "react-dom";
 import * as Three from "three";
 
-// TODO typedef
-// tslint:disable-next-line:no-var-requires
-const OrbitControls: any = require("three-orbit-controls")(Three);
-
 interface Location {
 	east: number;
 	north: number;
@@ -35,8 +31,6 @@ class Game extends React.Component<GameProps> {
 	private scene: Three.Scene;
 	private camera: Three.PerspectiveCamera;
 	private renderer: Three.WebGLRenderer;
-	// TODO: typedef
-	private controls: any;
 	private cube: Three.Mesh;
 	private frameId: number;
 
@@ -51,14 +45,9 @@ class Game extends React.Component<GameProps> {
 		this.scene = new Three.Scene();
 		this.camera = new Three.PerspectiveCamera(75, width / height);
 		this.renderer = new Three.WebGLRenderer();
-		this.controls = new OrbitControls(this.camera, this.renderer.domElement);
 
 		this.renderer.setSize(width, height);
 		this.mount.appendChild(this.renderer.domElement);
-
-		this.controls.rotateSpeed = 1.0;
-		this.controls.zoomSpeed = 1.2;
-		this.controls.panSpeed = 0.8;
 
 		this.camera.position.x = 0;
 		this.camera.position.y = 0;
