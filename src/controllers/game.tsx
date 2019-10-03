@@ -69,19 +69,13 @@ class Game extends React.Component<GameProps> {
 	}
 
 	public render(): React.ReactElement {
-		return (
-			<div>
-				<div
-					id="boardCanvas"
-					style={{ width: "80vw", height: "40vw" }}
-					ref={(mount) => {
-						if (mount) {
-							this.mount = mount;
-						}
-					}}
-				/>
-			</div>
-		);
+		const adoptMount = (mount: HTMLDivElement | null) => {
+			if (mount) {
+				this.mount = mount;
+			}
+		};
+		const fillView = { width: "100vw", height: "100vh" };
+		return <div style={fillView} ref={adoptMount} />;
 	}
 
 	private animate(): void {
