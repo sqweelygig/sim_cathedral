@@ -31,7 +31,6 @@ class Game extends React.Component<GameProps> {
 	private scene: Three.Scene;
 	private camera: Three.PerspectiveCamera;
 	private renderer: Three.WebGLRenderer;
-	private cube: Three.Mesh;
 	private frameId: number;
 
 	public constructor(props: GameProps) {
@@ -49,16 +48,28 @@ class Game extends React.Component<GameProps> {
 		this.renderer.setSize(width, height);
 		this.mount.appendChild(this.renderer.domElement);
 
-		this.camera.position.x = 0;
-		this.camera.position.y = 0;
-		this.camera.position.z = 4;
+		this.scene.background = new Three.Color(0x0000ff);
 
-		const geometry = new Three.BoxGeometry(1, 1, 1);
-		const material = new Three.MeshBasicMaterial({
-			color: 0xff00ff,
-		});
-		this.cube = new Three.Mesh(geometry, material);
-		this.scene.add(this.cube);
+		const sun = new Three.DirectionalLight(0xffffff);
+		this.scene.add(sun);
+
+		const grass = new Three.Mesh(
+			new Three.CircleGeometry(2.5),
+			new Three.MeshLambertMaterial({
+				color: 0x008800,
+			}),
+		);
+		grass.rotateX(-Math.PI / 2);
+		this.scene.add(grass);
+
+		const block = new Three.Mesh(
+			new Three.BoxGeometry(1, 1, 1),
+			new Three.MeshLambertMaterial({
+				color: 0x442200,
+			}),
+		);
+		block.position.y = 0.5;
+		this.scene.add(block);
 
 		this.animate();
 	}
@@ -83,8 +94,9 @@ class Game extends React.Component<GameProps> {
 		const radius = 2;
 		const frequency = 1 / 2000;
 		this.camera.position.x = radius * Math.sin(rightNow * frequency);
+		this.camera.position.y = 1.2;
 		this.camera.position.z = radius * Math.cos(rightNow * frequency);
-		this.camera.lookAt(0, 0, 0);
+		this.camera.lookAt(0, 1.2, 0);
 		this.renderer.render(this.scene, this.camera);
 		this.frameId = window.requestAnimationFrame(() => {
 			this.animate();
