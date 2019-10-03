@@ -87,22 +87,6 @@ class Game extends React.Component<GameProps> {
 	}
 }
 
-const simpleNave: BlockType = {
-	colour: {
-		hue: 0,
-		saturation: 128,
-		value: 128,
-	},
-	label: "Simple Nave",
-};
-const simpleAltar: BlockType = {
-	colour: {
-		hue: 0,
-		saturation: 128,
-		value: 128,
-	},
-	label: "Simple Altar",
-};
 const simpleChapel: Block[] = [
 	{
 		location: {
@@ -110,7 +94,14 @@ const simpleChapel: Block[] = [
 			north: 0,
 			up: 0,
 		},
-		type: simpleAltar,
+		type: {
+			colour: {
+				hue: 0,
+				saturation: 128,
+				value: 128,
+			},
+			label: "Simple Altar",
+		},
 	},
 	{
 		location: {
@@ -118,7 +109,14 @@ const simpleChapel: Block[] = [
 			north: 0,
 			up: 0,
 		},
-		type: simpleNave,
+		type: {
+			colour: {
+				hue: 0,
+				saturation: 128,
+				value: 128,
+			},
+			label: "Simple Nave",
+		},
 	},
 ];
 const game = <Game blocks={simpleChapel} />;
