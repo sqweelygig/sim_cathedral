@@ -22,6 +22,7 @@
 	"private": true,
 	"license": "ISC",
 	"devDependencies": {
+		"@types/node": "^12.7.9",
 		"@types/react": "^16.9.4",
 		"@types/react-dom": "^16.9.1",
 		"copy-webpack-plugin": "^5.0.4",
@@ -41,6 +42,8 @@
 	},
 	"dependencies": {
 		"react": "^16.10.1",
-		"react-dom": "^16.10.1"
+		"react-dom": "^16.10.1",
+		"three": "^0.109.0",
+		"three-orbit-controls": "^82.1.0"
 	}
 }
