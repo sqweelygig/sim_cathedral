@@ -79,7 +79,12 @@ class Game extends React.Component<GameProps> {
 	}
 
 	private animate(): void {
-		this.camera.position.x = 2 * Math.sin(new Date().getTime() / 2000);
+		const rightNow = new Date().getTime();
+		const radius = 2;
+		const frequency = 1 / 2000;
+		this.camera.position.x = radius * Math.sin(rightNow * frequency);
+		this.camera.position.z = radius * Math.cos(rightNow * frequency);
+		this.camera.lookAt(0, 0, 0);
 		this.renderer.render(this.scene, this.camera);
 		this.frameId = window.requestAnimationFrame(() => {
 			this.animate();
