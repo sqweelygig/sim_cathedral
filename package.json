@@ -1,5 +1,5 @@
 {
-	"name": "sim_cathedral",
+	"name": "ex_cathedra",
 	"version": "0.0.1",
 	"description": "",
 	"main": "./dist/game.html",
