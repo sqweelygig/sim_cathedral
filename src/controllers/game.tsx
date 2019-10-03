@@ -96,7 +96,7 @@ class Game extends React.Component<GameProps> {
 	}
 
 	private animate(): void {
-		this.camera.rotateY(0.1);
+		this.camera.position.x = 2 * Math.sin(new Date().getTime() / 2000);
 		this.renderer.render(this.scene, this.camera);
 		this.frameId = window.requestAnimationFrame(() => {
 			this.animate();
