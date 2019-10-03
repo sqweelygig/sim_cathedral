@@ -2,3 +2,4 @@
 .idea/
 sim_cathedral.iml
 dist/
+node_modules/
