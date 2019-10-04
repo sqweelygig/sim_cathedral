@@ -9,11 +9,7 @@ interface Location {
 }
 
 interface BlockType {
-	colour: {
-		hue: number;
-		saturation: number;
-		value: number;
-	};
+	colour: number;
 	label: string;
 }
 
@@ -54,7 +50,7 @@ class Game extends React.Component<GameProps> {
 		this.scene.add(sun);
 
 		const grass = new Three.Mesh(
-			new Three.CircleGeometry(2.5),
+			new Three.CircleGeometry(32, 64),
 			new Three.MeshLambertMaterial({
 				color: 0x008800,
 			}),
@@ -62,14 +58,18 @@ class Game extends React.Component<GameProps> {
 		grass.rotateX(-Math.PI / 2);
 		this.scene.add(grass);
 
-		const block = new Three.Mesh(
-			new Three.BoxGeometry(1, 1, 1),
-			new Three.MeshLambertMaterial({
-				color: 0x442200,
-			}),
-		);
-		block.position.y = 0.5;
-		this.scene.add(block);
+		this.props.blocks.forEach((block) => {
+			const cube = new Three.Mesh(
+				new Three.BoxGeometry(1, 1, 1),
+				new Three.MeshLambertMaterial({
+					color: block.type.colour,
+				}),
+			);
+			cube.position.y = block.location.up + 0.5;
+			cube.position.x = block.location.east;
+			cube.position.z = block.location.north;
+			this.scene.add(cube);
+		});
 
 		this.animate();
 	}
@@ -96,7 +96,7 @@ class Game extends React.Component<GameProps> {
 		this.camera.position.x = radius * Math.sin(rightNow * frequency);
 		this.camera.position.y = 1.2;
 		this.camera.position.z = radius * Math.cos(rightNow * frequency);
-		this.camera.lookAt(0, 1.2, 0);
+		this.camera.lookAt(0, 0.5, 0);
 		this.renderer.render(this.scene, this.camera);
 		this.frameId = window.requestAnimationFrame(() => {
 			this.animate();
@@ -112,11 +112,7 @@ const simpleChapel: Block[] = [
 			up: 0,
 		},
 		type: {
-			colour: {
-				hue: 0,
-				saturation: 128,
-				value: 128,
-			},
+			colour: 0x442200,
 			label: "Simple Altar",
 		},
 	},
@@ -127,11 +123,7 @@ const simpleChapel: Block[] = [
 			up: 0,
 		},
 		type: {
-			colour: {
-				hue: 0,
-				saturation: 128,
-				value: 128,
-			},
+			colour: 0x444400,
 			label: "Simple Nave",
 		},
 	},
