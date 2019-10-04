@@ -46,8 +46,11 @@ class Game extends React.Component<GameProps> {
 
 		this.scene.background = new Three.Color(0x0000ff);
 
-		const sun = new Three.DirectionalLight(0xffffff);
+		const sun = new Three.DirectionalLight(0xffffff, 0.5);
 		this.scene.add(sun);
+
+		const glow = new Three.AmbientLight(0xffffff, 0.5);
+		this.scene.add(glow);
 
 		const grass = new Three.Mesh(
 			new Three.CircleGeometry(32, 64),
