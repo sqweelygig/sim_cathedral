@@ -34,13 +34,12 @@ export class Perspective extends React.Component<PerspectiveProps> {
 		this.renderer.setSize(width, height);
 		this.mount.appendChild(this.renderer.domElement);
 
-		this.scene.background = new Three.Color(0x0000ff);
-
-		const sun = new Three.DirectionalLight(0xffffff, 0.5);
-		this.scene.add(sun);
-
-		const glow = new Three.AmbientLight(0xffffff, 0.5);
+		this.scene.background = new Three.Color(0x8888ff);
+		const glow = new Three.AmbientLight(0x8888ff, 0.5);
 		this.scene.add(glow);
+
+		const sun = new Three.DirectionalLight(0xffff88, 0.5);
+		this.scene.add(sun);
 
 		const grass = new Three.Mesh(
 			new Three.CircleGeometry(32, 64),
