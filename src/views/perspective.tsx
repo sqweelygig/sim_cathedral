@@ -2,11 +2,11 @@ import * as React from "react";
 import * as Three from "three";
 import { Block } from "../controllers/game";
 
-interface GameProps {
+export interface PerspectiveProps {
 	blocks: Block[];
 }
 
-export class Perspective extends React.Component<GameProps> {
+export class Perspective extends React.Component<PerspectiveProps> {
 	private mount: HTMLDivElement;
 	private scene: Three.Scene;
 	private camera: Three.PerspectiveCamera;
@@ -19,7 +19,7 @@ export class Perspective extends React.Component<GameProps> {
 	private minY: number = 0;
 	private minZ: number = 0;
 
-	public constructor(props: GameProps) {
+	public constructor(props: PerspectiveProps) {
 		super(props);
 	}
 
