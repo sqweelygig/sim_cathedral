@@ -42,7 +42,7 @@ export class Perspective extends React.Component<PerspectiveProps> {
 		this.renderer.shadowMap.enabled = true;
 		this.renderer.setSize(width, height);
 
-		this.scene.background = new Three.Color(0x669999);
+		this.scene.background = new Three.Color(0x5588aa);
 
 		const glow = new Three.AmbientLight(0x5588aa);
 		this.scene.add(glow);
@@ -97,6 +97,7 @@ export class Perspective extends React.Component<PerspectiveProps> {
 				style={{ width: "100vw", height: "100vh" }}
 				ref={this.setMount.bind(this)}
 				onMouseMove={this.onMouseMove.bind(this)}
+				onClick={this.onMouseClick.bind(this)}
 			/>
 		);
 	}
@@ -104,6 +105,14 @@ export class Perspective extends React.Component<PerspectiveProps> {
 	private onMouseMove(event: MouseEvent) {
 		this.mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
 		this.mouse.y = -(event.clientY / window.innerHeight) * 2 + 1;
+	}
+
+	private onMouseClick() {
+		console.log({
+			east: this.cursor.position.x,
+			south: this.cursor.position.z,
+			up: this.cursor.position.y - 0.5,
+		});
 	}
 
 	private setMount(mount: HTMLDivElement | null): void {
@@ -150,8 +159,6 @@ export class Perspective extends React.Component<PerspectiveProps> {
 		}
 
 		this.renderer.render(this.scene, this.camera);
-		this.nextFrame = window.requestAnimationFrame(() => {
-			this.animate();
-		});
+		this.nextFrame = window.requestAnimationFrame(this.animate.bind(this));
 	}
 }
