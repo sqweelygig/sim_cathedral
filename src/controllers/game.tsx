@@ -4,7 +4,7 @@ import { Perspective } from "../views/perspective";
 
 export interface Location {
 	east: number;
-	north: number;
+	south: number;
 	up: number;
 }
 
@@ -22,7 +22,7 @@ const simpleChapel: Cube[] = [
 	{
 		location: {
 			east: 0,
-			north: 0,
+			south: 0,
 			up: 0,
 		},
 		type: {
@@ -33,7 +33,7 @@ const simpleChapel: Cube[] = [
 	{
 		location: {
 			east: -1,
-			north: 0,
+			south: 0,
 			up: 0,
 		},
 		type: {

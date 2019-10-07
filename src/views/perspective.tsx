@@ -69,13 +69,13 @@ export class Perspective extends React.Component<PerspectiveProps> {
 			);
 			this.maxX = Math.max(this.maxX, cubeProps.location.east + 0.5);
 			this.minX = Math.min(this.minX, cubeProps.location.east - 0.5);
-			this.maxZ = Math.max(this.maxZ, cubeProps.location.north + 0.5);
-			this.minZ = Math.min(this.minZ, cubeProps.location.north - 0.5);
+			this.maxZ = Math.max(this.maxZ, cubeProps.location.south + 0.5);
+			this.minZ = Math.min(this.minZ, cubeProps.location.south - 0.5);
 			this.maxY = Math.max(this.maxY, cubeProps.location.up + 1);
 			this.minY = Math.min(this.minY, cubeProps.location.up);
 			cube.position.y = cubeProps.location.up + 0.5;
 			cube.position.x = cubeProps.location.east;
-			cube.position.z = cubeProps.location.north;
+			cube.position.z = cubeProps.location.south;
 			cube.castShadow = true;
 			cube.receiveShadow = true;
 			this.scene.add(cube);
