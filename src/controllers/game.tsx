@@ -8,17 +8,17 @@ export interface Location {
 	up: number;
 }
 
-export interface BlockType {
+export interface CubeType {
 	colour: number;
 	label: string;
 }
 
-export interface Block {
+export interface Cube {
 	location: Location;
-	type: BlockType;
+	type: CubeType;
 }
 
-const simpleChapel: Block[] = [
+const simpleChapel: Cube[] = [
 	{
 		location: {
 			east: 0,
@@ -42,5 +42,5 @@ const simpleChapel: Block[] = [
 		},
 	},
 ];
-const game = <Perspective blocks={simpleChapel} />;
+const game = <Perspective cubes={simpleChapel} />;
 ReactDOM.render(game, document.body);

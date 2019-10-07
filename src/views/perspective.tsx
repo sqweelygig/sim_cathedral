@@ -1,17 +1,26 @@
 import * as React from "react";
 import * as Three from "three";
-import { Block } from "../controllers/game";
+import { Cube } from "../controllers/game";
 
 export interface PerspectiveProps {
-	blocks: Block[];
+	cubes: Cube[];
 }
 
 export class Perspective extends React.Component<PerspectiveProps> {
 	private mount: HTMLDivElement;
-	private scene: Three.Scene;
 	private camera: Three.PerspectiveCamera;
-	private renderer: Three.WebGLRenderer;
-	private sun: Three.DirectionalLight;
+	private readonly scene: Three.Scene = new Three.Scene();
+	private readonly renderer: Three.WebGLRenderer = new Three.WebGLRenderer();
+	private readonly sun: Three.DirectionalLight = new Three.DirectionalLight(
+		0xaa7755,
+	);
+	private readonly mouse: Three.Vector2 = new Three.Vector2();
+	private readonly mouseRay = new Three.Raycaster();
+	private readonly cursor: Three.Mesh = new Three.Mesh(
+		new Three.BoxGeometry(1, 1, 1),
+		new Three.MeshBasicMaterial({ color: 0x0000ff, wireframe: true }),
+	);
+	private readonly cubes: Three.Mesh[] = [];
 	private nextFrame: number;
 	private maxX: number = 0;
 	private maxY: number = 0;
@@ -28,17 +37,16 @@ export class Perspective extends React.Component<PerspectiveProps> {
 		const width = this.mount.clientWidth;
 		const height = this.mount.clientHeight;
 
-		this.scene = new Three.Scene();
 		this.camera = new Three.PerspectiveCamera(75, width / height);
-		this.renderer = new Three.WebGLRenderer();
-		this.renderer.shadowMap.enabled = true;
 
+		this.renderer.shadowMap.enabled = true;
 		this.renderer.setSize(width, height);
+
 		this.scene.background = new Three.Color(0x669999);
+
 		const glow = new Three.AmbientLight(0x5588aa);
 		this.scene.add(glow);
 
-		this.sun = new Three.DirectionalLight(0xaa7755);
 		this.sun.castShadow = true;
 		this.scene.add(this.sun);
 
@@ -52,25 +60,26 @@ export class Perspective extends React.Component<PerspectiveProps> {
 		grass.receiveShadow = true;
 		this.scene.add(grass);
 
-		this.props.blocks.forEach((block) => {
+		this.props.cubes.forEach((cubeProps) => {
 			const cube = new Three.Mesh(
 				new Three.BoxGeometry(1, 1, 1),
 				new Three.MeshLambertMaterial({
-					color: block.type.colour,
+					color: cubeProps.type.colour,
 				}),
 			);
-			this.maxX = Math.max(this.maxX, block.location.east + 0.5);
-			this.minX = Math.min(this.minX, block.location.east - 0.5);
-			this.maxZ = Math.max(this.maxZ, block.location.north + 0.5);
-			this.minZ = Math.min(this.minZ, block.location.north - 0.5);
-			this.maxY = Math.max(this.maxY, block.location.up + 1);
-			this.minY = Math.min(this.minY, block.location.up);
-			cube.position.y = block.location.up + 0.5;
-			cube.position.x = block.location.east;
-			cube.position.z = block.location.north;
+			this.maxX = Math.max(this.maxX, cubeProps.location.east + 0.5);
+			this.minX = Math.min(this.minX, cubeProps.location.east - 0.5);
+			this.maxZ = Math.max(this.maxZ, cubeProps.location.north + 0.5);
+			this.minZ = Math.min(this.minZ, cubeProps.location.north - 0.5);
+			this.maxY = Math.max(this.maxY, cubeProps.location.up + 1);
+			this.minY = Math.min(this.minY, cubeProps.location.up);
+			cube.position.y = cubeProps.location.up + 0.5;
+			cube.position.x = cubeProps.location.east;
+			cube.position.z = cubeProps.location.north;
 			cube.castShadow = true;
 			cube.receiveShadow = true;
 			this.scene.add(cube);
+			this.cubes.push(cube);
 		});
 
 		this.animate();
@@ -83,13 +92,24 @@ export class Perspective extends React.Component<PerspectiveProps> {
 	}
 
 	public render(): React.ReactElement {
-		const adoptMount = (mount: HTMLDivElement | null) => {
-			if (mount) {
-				this.mount = mount;
-			}
-		};
-		const fillView = { width: "100vw", height: "100vh" };
-		return <div style={fillView} ref={adoptMount} />;
+		return (
+			<div
+				style={{ width: "100vw", height: "100vh" }}
+				ref={this.setMount.bind(this)}
+				onMouseMove={this.onMouseMove.bind(this)}
+			/>
+		);
+	}
+
+	private onMouseMove(event: MouseEvent) {
+		this.mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
+		this.mouse.y = -(event.clientY / window.innerHeight) * 2 + 1;
+	}
+
+	private setMount(mount: HTMLDivElement | null): void {
+		if (mount) {
+			this.mount = mount;
+		}
 	}
 
 	private animate(): void {
@@ -107,15 +127,27 @@ export class Perspective extends React.Component<PerspectiveProps> {
 			this.maxZ - this.minZ,
 			this.maxY - this.minY,
 		);
-		const frequency = 1 / 4000;
 		const centreX = (this.maxX + this.minX) / 2;
 		const centreY = (this.maxY + this.minY) / 2;
 		const centreZ = (this.maxZ + this.minZ) / 2;
-		const cameraTheta = rightNow * frequency;
+		const cameraTheta = rightNow / 4000;
 		this.camera.position.x = cameraDistance * Math.sin(cameraTheta) + centreX;
 		this.camera.position.y = this.maxY + 0.25;
 		this.camera.position.z = cameraDistance * Math.cos(cameraTheta) + centreZ;
 		this.camera.lookAt(centreX, centreY, centreZ);
+
+		this.mouseRay.setFromCamera(this.mouse, this.camera);
+		const intersections = this.mouseRay.intersectObjects(this.cubes);
+		if (intersections.length > 0 && intersections[0].face) {
+			const position = intersections[0].object.position;
+			const normal = intersections[0].face.normal;
+			this.cursor.position.x = position.x + normal.x;
+			this.cursor.position.y = position.y + normal.y;
+			this.cursor.position.z = position.z + normal.z;
+			this.scene.add(this.cursor);
+		} else {
+			this.scene.remove(this.cursor);
+		}
 
 		this.renderer.render(this.scene, this.camera);
 		this.nextFrame = window.requestAnimationFrame(() => {
