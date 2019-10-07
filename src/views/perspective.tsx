@@ -11,7 +11,8 @@ export class Perspective extends React.Component<PerspectiveProps> {
 	private scene: Three.Scene;
 	private camera: Three.PerspectiveCamera;
 	private renderer: Three.WebGLRenderer;
-	private frameId: number;
+	private sun: Three.DirectionalLight;
+	private nextFrame: number;
 	private maxX: number = 0;
 	private maxY: number = 0;
 	private maxZ: number = 0;
@@ -30,16 +31,16 @@ export class Perspective extends React.Component<PerspectiveProps> {
 		this.scene = new Three.Scene();
 		this.camera = new Three.PerspectiveCamera(75, width / height);
 		this.renderer = new Three.WebGLRenderer();
+		this.renderer.shadowMap.enabled = true;
 
 		this.renderer.setSize(width, height);
-		this.mount.appendChild(this.renderer.domElement);
-
-		this.scene.background = new Three.Color(0x8888ff);
-		const glow = new Three.AmbientLight(0x8888ff, 0.5);
+		this.scene.background = new Three.Color(0x669999);
+		const glow = new Three.AmbientLight(0x5588aa);
 		this.scene.add(glow);
 
-		const sun = new Three.DirectionalLight(0xffff88, 0.5);
-		this.scene.add(sun);
+		this.sun = new Three.DirectionalLight(0xaa7755);
+		this.sun.castShadow = true;
+		this.scene.add(this.sun);
 
 		const grass = new Three.Mesh(
 			new Three.CircleGeometry(32, 64),
@@ -48,6 +49,7 @@ export class Perspective extends React.Component<PerspectiveProps> {
 			}),
 		);
 		grass.rotateX(-Math.PI / 2);
+		grass.receiveShadow = true;
 		this.scene.add(grass);
 
 		this.props.blocks.forEach((block) => {
@@ -66,14 +68,17 @@ export class Perspective extends React.Component<PerspectiveProps> {
 			cube.position.y = block.location.up + 0.5;
 			cube.position.x = block.location.east;
 			cube.position.z = block.location.north;
+			cube.castShadow = true;
+			cube.receiveShadow = true;
 			this.scene.add(cube);
 		});
 
 		this.animate();
+		this.mount.appendChild(this.renderer.domElement);
 	}
 
 	public componentWillUnmount(): void {
-		cancelAnimationFrame(this.frameId);
+		cancelAnimationFrame(this.nextFrame);
 		this.mount.removeChild(this.renderer.domElement);
 	}
 
@@ -89,21 +94,31 @@ export class Perspective extends React.Component<PerspectiveProps> {
 
 	private animate(): void {
 		const rightNow = new Date().getTime();
-		const radius = Math.max(
+		const perDay = 60 * 60 * 24 * 1000;
+		const sinceMidnight = rightNow % perDay;
+
+		const solarTheta = (sinceMidnight * 2 * Math.PI) / perDay;
+		this.sun.position.x = Math.sin(solarTheta);
+		this.sun.position.y = -Math.cos(solarTheta) / Math.sqrt(2);
+		this.sun.position.z = this.sun.position.y;
+
+		const cameraDistance = Math.max(
 			this.maxX - this.minX,
 			this.maxZ - this.minZ,
 			this.maxY - this.minY,
 		);
-		const frequency = 1 / 2000;
+		const frequency = 1 / 4000;
 		const centreX = (this.maxX + this.minX) / 2;
 		const centreY = (this.maxY + this.minY) / 2;
 		const centreZ = (this.maxZ + this.minZ) / 2;
-		this.camera.position.x = radius * Math.sin(rightNow * frequency) + centreX;
+		const cameraTheta = rightNow * frequency;
+		this.camera.position.x = cameraDistance * Math.sin(cameraTheta) + centreX;
 		this.camera.position.y = this.maxY + 0.25;
-		this.camera.position.z = radius * Math.cos(rightNow * frequency) + centreZ;
+		this.camera.position.z = cameraDistance * Math.cos(cameraTheta) + centreZ;
 		this.camera.lookAt(centreX, centreY, centreZ);
+
 		this.renderer.render(this.scene, this.camera);
-		this.frameId = window.requestAnimationFrame(() => {
+		this.nextFrame = window.requestAnimationFrame(() => {
 			this.animate();
 		});
 	}
