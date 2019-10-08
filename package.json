@@ -20,7 +20,6 @@
 	"keywords": [],
 	"author": "Andrew Lucas",
 	"private": true,
-	"license": "ISC",
 	"devDependencies": {
 		"@types/node": "^12.7.9",
 		"@types/react": "^16.9.4",
