@@ -24,13 +24,14 @@ Thoughts
 DevDiary
 --
 
-### 2019-08-?? sqweelygig
-I really like CEO games.  Could I make a game, either tile/board or browser, that would capture some of that?  Have mooched around several ideas, played several games and found some thoughts.  I also watched a lot of Time Team and realised that the cathedral, with monasteries, saints, parishes and reformations is both fascinating and enclosed.
-
-### 2019-09-?? sqweelygig & chaos_fairy
-Had many discussions around currency, gold, and its necessity.  Formed "Currency" thought.  Also realised educational notes to the theme, and realised that this would fit superbly with a slow-play game.
-
 ### 2019-10-08 sqweelygig
 Have created a basic render that shows a set of blocks from a hard-coded array and calculates a cursor point based on mouse location.  Its not much, but it is a start.  I am performing a few housekeeping tasks and pushing to github, partly because I'm a few days into the project and partly because it a very pertinent portfolio piece for a job application I am making.
 
 ![basic render, showing two cubes with shadows](lib/screenshot-2019-10-08.png)
+
+## 2019-09-?? sqweelygig & chaos_fairy
+Had many discussions around currency, gold, and its necessity.  Formed "Currency" thought.  Also realised educational notes to the theme, and realised that this would fit superbly with a slow-play game.
+
+### 2019-08-?? sqweelygig
+I really like CEO games.  Could I make a game, either tile/board or browser, that would capture some of that?  Have mooched around several ideas, played several games and found some thoughts.  I also watched a lot of Time Team and realised that the cathedral, with monasteries, saints, parishes and reformations is both fascinating and enclosed.
+
