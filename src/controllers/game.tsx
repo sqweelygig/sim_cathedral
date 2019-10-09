@@ -8,39 +8,54 @@ export interface Location {
 	up: number;
 }
 
-export interface CubeType {
-	colour: number;
-	label: string;
-}
-
 export interface Cube {
 	location: Location;
 	type: CubeType;
 }
 
-const simpleChapel: Cube[] = [
-	{
-		location: {
-			east: 0,
-			south: 0,
-			up: 0,
-		},
-		type: {
-			colour: 0x442200,
-			label: "Simple Altar",
-		},
-	},
-	{
-		location: {
-			east: -1,
-			south: 0,
-			up: 0,
-		},
-		type: {
-			colour: 0x444400,
-			label: "Simple Nave",
-		},
-	},
-];
-const game = <Perspective cubes={simpleChapel} />;
-ReactDOM.render(game, document.body);
+interface CubeType {
+	colour: number;
+	label: string;
+}
+
+interface GameState {
+	cubes: Cube[];
+}
+
+const simpleNave = { colour: 0x444400, label: "Simple Nave" };
+
+const simpleAltar = { colour: 0x442200, label: "Simple Altar" };
+
+class Game extends React.Component<{}, GameState> {
+	constructor(props: {}) {
+		super(props);
+		// TODO: Game state to be streamed to/from server.
+		this.state = {
+			cubes: [
+				{
+					location: {
+						east: 0,
+						south: 0,
+						up: 0,
+					},
+					type: simpleAltar,
+				},
+			],
+		};
+	}
+
+	public render(): React.ReactElement {
+		return (
+			<Perspective cubes={this.state.cubes} addCube={this.addCube.bind(this)} />
+		);
+	}
+
+	private addCube(location: Location): void {
+		const cubes = this.state.cubes.concat([{ location, type: simpleNave }]);
+		this.setState({
+			cubes,
+		});
+	}
+}
+
+ReactDOM.render(<Game />, document.body);
