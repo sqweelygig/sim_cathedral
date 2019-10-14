@@ -13,7 +13,7 @@ export class Perspective extends React.Component<PerspectiveProps> {
 	}
 
 	private mount: HTMLDivElement;
-	private camera: Three.PerspectiveCamera;
+	private camera = new Three.PerspectiveCamera(75, 1);
 	private readonly scene = new Three.Scene();
 	private readonly renderer = new Three.WebGLRenderer();
 	private readonly sun = new Three.DirectionalLight(0xaa7755);
@@ -75,12 +75,8 @@ export class Perspective extends React.Component<PerspectiveProps> {
 	}
 
 	private configureRender(): void {
-		const width = this.mount.clientWidth;
-		const height = this.mount.clientHeight;
-		this.camera = new Three.PerspectiveCamera(75, width / height);
 		this.camera.position.y = 1.25;
 		this.renderer.shadowMap.enabled = true;
-		this.renderer.setSize(width, height);
 		this.renderer.setAnimationLoop(this.animationLoop.bind(this));
 		this.mount.appendChild(this.renderer.domElement);
 	}
@@ -183,6 +179,11 @@ export class Perspective extends React.Component<PerspectiveProps> {
 		position.z = this.cameraDistance * Math.cos(rotation) + target.z;
 		position.y = position.y + lift;
 		this.camera.lookAt(target.x, target.y, target.z);
+		const shortestAspect = Math.min(
+			this.mount.clientHeight,
+			this.mount.clientWidth,
+		);
+		this.renderer.setSize(shortestAspect, shortestAspect);
 	}
 
 	private adjustCursor(): void {
