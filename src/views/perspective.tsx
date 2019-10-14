@@ -24,16 +24,7 @@ export class Perspective extends React.Component<PerspectiveProps> {
 		new Three.MeshBasicMaterial({ color: 0x0000ff, wireframe: true }),
 	);
 	private renderedCubes: Three.Mesh[] = [];
-	private readonly max = {
-		x: 0,
-		y: 0,
-		z: 0,
-	};
-	private readonly min = {
-		x: 0,
-		y: 0,
-		z: 0,
-	};
+	private cathedralHeight = 0;
 	private readonly centre = {
 		x: 0,
 		y: 0,
@@ -106,6 +97,16 @@ export class Perspective extends React.Component<PerspectiveProps> {
 		this.renderedCubes.forEach((renderedCube) => {
 			this.scene.remove(renderedCube);
 		});
+		const max = {
+			x: 0,
+			y: 0,
+			z: 0,
+		};
+		const min = {
+			x: 0,
+			y: 0,
+			z: 0,
+		};
 		this.renderedCubes = this.props.cubes.map((cubeToRender) => {
 			const renderedCube = new Three.Mesh(
 				new Three.BoxGeometry(1, 1, 1),
@@ -113,12 +114,12 @@ export class Perspective extends React.Component<PerspectiveProps> {
 					color: cubeToRender.type.colour,
 				}),
 			);
-			this.max.x = Math.max(this.max.x, cubeToRender.location.east + 0.5);
-			this.max.z = Math.max(this.max.z, cubeToRender.location.south + 0.5);
-			this.min.x = Math.min(this.min.x, cubeToRender.location.east - 0.5);
-			this.min.z = Math.min(this.min.z, cubeToRender.location.south - 0.5);
-			this.max.y = Math.max(this.max.y, cubeToRender.location.up + 1);
-			this.min.y = Math.min(this.min.y, cubeToRender.location.up);
+			max.x = Math.max(max.x, cubeToRender.location.east + 0.5);
+			max.z = Math.max(max.z, cubeToRender.location.south + 0.5);
+			min.x = Math.min(min.x, cubeToRender.location.east - 0.5);
+			min.z = Math.min(min.z, cubeToRender.location.south - 0.5);
+			max.y = Math.max(max.y, cubeToRender.location.up + 1);
+			min.y = Math.min(min.y, cubeToRender.location.up);
 			renderedCube.position.y = cubeToRender.location.up + 0.5;
 			renderedCube.position.x = cubeToRender.location.east;
 			renderedCube.position.z = cubeToRender.location.south;
@@ -127,14 +128,11 @@ export class Perspective extends React.Component<PerspectiveProps> {
 			this.scene.add(renderedCube);
 			return renderedCube;
 		});
-		this.centre.x = (this.max.x + this.min.x) / 2;
-		this.centre.z = (this.max.z + this.min.z) / 2;
-		this.centre.y = (this.max.y + this.min.y) / 2;
-		this.longestAxis = Math.max(
-			this.max.x - this.min.x,
-			this.max.z - this.min.z,
-			this.max.y - this.min.y,
-		);
+		this.centre.x = (max.x + min.x) / 2;
+		this.centre.z = (max.z + min.z) / 2;
+		this.centre.y = (max.y + min.y) / 2;
+		this.cathedralHeight = max.y;
+		this.longestAxis = Math.max(max.x - min.x, max.z - min.z, max.y - min.y);
 	}
 
 	private onMouseMove(event: MouseEvent) {
@@ -177,7 +175,10 @@ export class Perspective extends React.Component<PerspectiveProps> {
 		this.cameraDistance += Perspective.throttle(zoom, 0.01);
 		position.x = this.cameraDistance * Math.sin(rotation) + target.x;
 		position.z = this.cameraDistance * Math.cos(rotation) + target.z;
-		position.y += Perspective.throttle(0.25 + this.max.y - position.y, 0.01);
+		position.y += Perspective.throttle(
+			0.25 + this.cathedralHeight - position.y,
+			0.01,
+		);
 		this.camera.lookAt(target.x, target.y, target.z);
 		const height = this.mount.clientHeight;
 		const width = this.mount.clientWidth;
