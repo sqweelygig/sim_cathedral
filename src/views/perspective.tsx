@@ -149,8 +149,14 @@ export class Perspective extends React.Component<PerspectiveProps> {
 	}
 
 	private onMouseMove(event: MouseEvent) {
-		this.mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
-		this.mouse.y = -(event.clientY / window.innerHeight) * 2 + 1;
+		this.mouse.x = (event.clientX / this.getMountSize()) * 2 - 1;
+		this.mouse.y = -(event.clientY / this.getMountSize()) * 2 + 1;
+	}
+
+	private getMountSize() {
+		const height = this.mount.clientHeight;
+		const width = this.mount.clientWidth;
+		return Math.min(height, width);
 	}
 
 	private onMouseClick() {
@@ -193,10 +199,7 @@ export class Perspective extends React.Component<PerspectiveProps> {
 			0.01,
 		);
 		this.camera.lookAt(target.x, target.y, target.z);
-		const height = this.mount.clientHeight;
-		const width = this.mount.clientWidth;
-		const shortestAspect = Math.min(height, width);
-		this.renderer.setSize(shortestAspect, shortestAspect);
+		this.renderer.setSize(this.getMountSize(), this.getMountSize());
 	}
 
 	private adjustCursor(): void {
