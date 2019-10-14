@@ -8,12 +8,12 @@ export interface PerspectiveProps {
 }
 
 export class Perspective extends React.Component<PerspectiveProps> {
-	private static throttle(n: number): number {
-		return Math.min(Math.max(n, -0.01), 0.01);
+	private static throttle(n: number, limit = 1): number {
+		return Math.min(Math.max(n, -Math.abs(limit)), Math.abs(limit));
 	}
 
 	private mount: HTMLDivElement;
-	private camera: Three.PerspectiveCamera;
+	private camera = new Three.PerspectiveCamera(75, 1);
 	private readonly scene = new Three.Scene();
 	private readonly renderer = new Three.WebGLRenderer();
 	private readonly sun = new Three.DirectionalLight(0xaa7755);
@@ -24,23 +24,13 @@ export class Perspective extends React.Component<PerspectiveProps> {
 		new Three.MeshBasicMaterial({ color: 0x0000ff, wireframe: true }),
 	);
 	private renderedCubes: Three.Mesh[] = [];
-	private nextFrame: number;
-	private readonly max = {
-		x: 0,
-		y: 0,
-		z: 0,
-	};
-	private readonly min = {
-		x: 0,
-		y: 0,
-		z: 0,
-	};
+	private cathedralHeight = 0;
 	private readonly centre = {
 		x: 0,
 		y: 0,
 		z: 0,
 	};
-	private longestAxis = 0;
+	private furthestDistance = 0;
 	private cameraDistance = 1;
 	private readonly cameraTarget = {
 		x: 0,
@@ -49,12 +39,10 @@ export class Perspective extends React.Component<PerspectiveProps> {
 	};
 
 	public componentDidMount(): void {
-		this.configureRender();
 		this.setScene();
 		this.lightScene();
 		this.updateCubes();
-		this.initialiseAnimation();
-		this.mount.appendChild(this.renderer.domElement);
+		this.configureRender();
 	}
 
 	public componentDidUpdate(): void {
@@ -62,7 +50,7 @@ export class Perspective extends React.Component<PerspectiveProps> {
 	}
 
 	public componentWillUnmount(): void {
-		cancelAnimationFrame(this.nextFrame);
+		this.renderer.setAnimationLoop(null);
 		this.mount.removeChild(this.renderer.domElement);
 	}
 
@@ -78,12 +66,10 @@ export class Perspective extends React.Component<PerspectiveProps> {
 	}
 
 	private configureRender(): void {
-		const width = this.mount.clientWidth;
-		const height = this.mount.clientHeight;
-		this.camera = new Three.PerspectiveCamera(75, width / height);
 		this.camera.position.y = 1.25;
 		this.renderer.shadowMap.enabled = true;
-		this.renderer.setSize(width, height);
+		this.renderer.setAnimationLoop(this.animationLoop.bind(this));
+		this.mount.appendChild(this.renderer.domElement);
 	}
 
 	private lightScene(): void {
@@ -96,7 +82,7 @@ export class Perspective extends React.Component<PerspectiveProps> {
 	private setScene(): void {
 		this.scene.background = new Three.Color(0x5588aa);
 		const grass = new Three.Mesh(
-			new Three.CircleGeometry(32, 64),
+			new Three.CircleGeometry(32, 256),
 			new Three.MeshLambertMaterial({
 				color: 0x008800,
 			}),
@@ -111,6 +97,16 @@ export class Perspective extends React.Component<PerspectiveProps> {
 		this.renderedCubes.forEach((renderedCube) => {
 			this.scene.remove(renderedCube);
 		});
+		const max = {
+			x: 0,
+			y: 0,
+			z: 0,
+		};
+		const min = {
+			x: 0,
+			y: 0,
+			z: 0,
+		};
 		this.renderedCubes = this.props.cubes.map((cubeToRender) => {
 			const renderedCube = new Three.Mesh(
 				new Three.BoxGeometry(1, 1, 1),
@@ -118,12 +114,12 @@ export class Perspective extends React.Component<PerspectiveProps> {
 					color: cubeToRender.type.colour,
 				}),
 			);
-			this.max.x = Math.max(this.max.x, cubeToRender.location.east + 0.5);
-			this.max.z = Math.max(this.max.z, cubeToRender.location.south + 0.5);
-			this.min.x = Math.min(this.min.x, cubeToRender.location.east - 0.5);
-			this.min.z = Math.min(this.min.z, cubeToRender.location.south - 0.5);
-			this.max.y = Math.max(this.max.y, cubeToRender.location.up + 1);
-			this.min.y = Math.min(this.min.y, cubeToRender.location.up);
+			max.x = Math.max(max.x, cubeToRender.location.east + 0.5);
+			max.z = Math.max(max.z, cubeToRender.location.south + 0.5);
+			min.x = Math.min(min.x, cubeToRender.location.east - 0.5);
+			min.z = Math.min(min.z, cubeToRender.location.south - 0.5);
+			max.y = Math.max(max.y, cubeToRender.location.up + 1);
+			min.y = Math.min(min.y, cubeToRender.location.up);
 			renderedCube.position.y = cubeToRender.location.up + 0.5;
 			renderedCube.position.x = cubeToRender.location.east;
 			renderedCube.position.z = cubeToRender.location.south;
@@ -132,19 +128,35 @@ export class Perspective extends React.Component<PerspectiveProps> {
 			this.scene.add(renderedCube);
 			return renderedCube;
 		});
-		this.centre.x = (this.max.x + this.min.x) / 2;
-		this.centre.z = (this.max.z + this.min.z) / 2;
-		this.centre.y = (this.max.y + this.min.y) / 2;
-		this.longestAxis = Math.max(
-			this.max.x - this.min.x,
-			this.max.z - this.min.z,
-			this.max.y - this.min.y,
-		);
+		this.centre.x = (max.x + min.x) / 2;
+		this.centre.z = (max.z + min.z) / 2;
+		this.centre.y = (max.y + min.y) / 2;
+		this.furthestDistance = this.renderedCubes.reduce((previous, cube) => {
+			const offset = {
+				x: Math.abs(cube.position.x - this.centre.x) + 0.5,
+				y: Math.abs(cube.position.y - this.centre.y) + 0.5,
+				z: Math.abs(cube.position.z - this.centre.z) + 0.5,
+			};
+			const squares = {
+				x: Math.pow(offset.x, 2),
+				y: Math.pow(offset.y, 2),
+				z: Math.pow(offset.z, 2),
+			};
+			const distance = Math.sqrt(squares.x + squares.y + squares.z);
+			return Math.max(distance, previous);
+		}, 0);
+		this.cathedralHeight = max.y;
 	}
 
 	private onMouseMove(event: MouseEvent) {
-		this.mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
-		this.mouse.y = -(event.clientY / window.innerHeight) * 2 + 1;
+		this.mouse.x = (event.clientX / this.getMountSize()) * 2 - 1;
+		this.mouse.y = -(event.clientY / this.getMountSize()) * 2 + 1;
+	}
+
+	private getMountSize() {
+		const height = this.mount.clientHeight;
+		const width = this.mount.clientWidth;
+		return Math.min(height, width);
 	}
 
 	private onMouseClick() {
@@ -170,20 +182,24 @@ export class Perspective extends React.Component<PerspectiveProps> {
 		this.sun.position.z = this.sun.position.y;
 	}
 
-	private rotateCamera(rightNow = new Date().getTime()): void {
+	private adjustCamera(rightNow = new Date().getTime()): void {
 		const rotation = (2 * Math.PI * rightNow) / (20 * 1e3);
 		const target = this.cameraTarget;
 		const position = this.camera.position;
-		target.x = target.x + Perspective.throttle(this.centre.x - target.x);
-		target.y = target.y + Perspective.throttle(this.centre.y - target.y);
-		target.z = target.z + Perspective.throttle(this.centre.z - target.z);
-		const zoom = Perspective.throttle(this.longestAxis - this.cameraDistance);
-		this.cameraDistance = this.cameraDistance + zoom;
-		const lift = Perspective.throttle(0.25 + this.max.y - position.y);
+		target.x += Perspective.throttle(this.centre.x - target.x, 0.01);
+		target.y += Perspective.throttle(this.centre.y - target.y, 0.01);
+		target.z += Perspective.throttle(this.centre.z - target.z, 0.01);
+		const distance = this.cameraDistance;
+		const zoom = 1.7 * this.furthestDistance - distance;
+		this.cameraDistance += Perspective.throttle(zoom, 0.01);
 		position.x = this.cameraDistance * Math.sin(rotation) + target.x;
 		position.z = this.cameraDistance * Math.cos(rotation) + target.z;
-		position.y = position.y + lift;
+		position.y += Perspective.throttle(
+			0.25 + this.cathedralHeight - position.y,
+			0.01,
+		);
 		this.camera.lookAt(target.x, target.y, target.z);
+		this.renderer.setSize(this.getMountSize(), this.getMountSize());
 	}
 
 	private adjustCursor(): void {
@@ -201,14 +217,11 @@ export class Perspective extends React.Component<PerspectiveProps> {
 		}
 	}
 
-	private initialiseAnimation(): void {
+	private animationLoop(): void {
 		const rightNow = new Date().getTime();
 		this.adjustLighting(rightNow);
-		this.rotateCamera(rightNow);
+		this.adjustCamera(rightNow);
 		this.adjustCursor();
 		this.renderer.render(this.scene, this.camera);
-		this.nextFrame = window.requestAnimationFrame(
-			this.initialiseAnimation.bind(this),
-		);
 	}
 }
