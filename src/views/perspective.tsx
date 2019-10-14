@@ -169,20 +169,18 @@ export class Perspective extends React.Component<PerspectiveProps> {
 		const rotation = (2 * Math.PI * rightNow) / (20 * 1e3);
 		const target = this.cameraTarget;
 		const position = this.camera.position;
-		target.x = target.x + Perspective.throttle(this.centre.x - target.x);
-		target.y = target.y + Perspective.throttle(this.centre.y - target.y);
-		target.z = target.z + Perspective.throttle(this.centre.z - target.z);
-		const zoom = Perspective.throttle(this.longestAxis - this.cameraDistance);
-		this.cameraDistance = this.cameraDistance + zoom;
-		const lift = Perspective.throttle(0.25 + this.max.y - position.y);
+		target.x += Perspective.throttle(this.centre.x - target.x);
+		target.y += Perspective.throttle(this.centre.y - target.y);
+		target.z += Perspective.throttle(this.centre.z - target.z);
+		const distance = this.cameraDistance;
+		this.cameraDistance += Perspective.throttle(this.longestAxis - distance);
 		position.x = this.cameraDistance * Math.sin(rotation) + target.x;
 		position.z = this.cameraDistance * Math.cos(rotation) + target.z;
-		position.y = position.y + lift;
+		position.y += Perspective.throttle(0.25 + this.max.y - position.y);
 		this.camera.lookAt(target.x, target.y, target.z);
-		const shortestAspect = Math.min(
-			this.mount.clientHeight,
-			this.mount.clientWidth,
-		);
+		const height = this.mount.clientHeight;
+		const width = this.mount.clientWidth;
+		const shortestAspect = Math.min(height, width);
 		this.renderer.setSize(shortestAspect, shortestAspect);
 	}
 
