@@ -8,6 +8,10 @@ export interface PerspectiveProps {
 }
 
 export class Perspective extends React.Component<PerspectiveProps> {
+	private static throttle(n: number): number {
+		return Math.min(Math.max(n, -0.01), 0.01);
+	}
+
 	private mount: HTMLDivElement;
 	private camera: Three.PerspectiveCamera;
 	private readonly scene = new Three.Scene();
@@ -37,6 +41,12 @@ export class Perspective extends React.Component<PerspectiveProps> {
 		z: 0,
 	};
 	private longestAxis = 0;
+	private cameraDistance = 1;
+	private readonly cameraTarget = {
+		x: 0,
+		y: 0.5,
+		z: 0,
+	};
 
 	public componentDidMount(): void {
 		this.configureRender();
@@ -71,6 +81,7 @@ export class Perspective extends React.Component<PerspectiveProps> {
 		const width = this.mount.clientWidth;
 		const height = this.mount.clientHeight;
 		this.camera = new Three.PerspectiveCamera(75, width / height);
+		this.camera.position.y = 1.25;
 		this.renderer.shadowMap.enabled = true;
 		this.renderer.setSize(width, height);
 	}
@@ -160,13 +171,19 @@ export class Perspective extends React.Component<PerspectiveProps> {
 	}
 
 	private rotateCamera(rightNow = new Date().getTime()): void {
-		const rotation = rightNow / 4000;
-		const distance = this.longestAxis;
-		const centre = this.centre;
-		this.camera.position.x = distance * Math.sin(rotation) + centre.x;
-		this.camera.position.z = distance * Math.cos(rotation) + centre.z;
-		this.camera.position.y = this.max.y + 0.25;
-		this.camera.lookAt(centre.x, centre.y, centre.z);
+		const rotation = (2 * Math.PI * rightNow) / (20 * 1e3);
+		const target = this.cameraTarget;
+		const position = this.camera.position;
+		target.x = target.x + Perspective.throttle(this.centre.x - target.x);
+		target.y = target.y + Perspective.throttle(this.centre.y - target.y);
+		target.z = target.z + Perspective.throttle(this.centre.z - target.z);
+		const zoom = Perspective.throttle(this.longestAxis - this.cameraDistance);
+		this.cameraDistance = this.cameraDistance + zoom;
+		const lift = Perspective.throttle(0.25 + this.max.y - position.y);
+		position.x = this.cameraDistance * Math.sin(rotation) + target.x;
+		position.z = this.cameraDistance * Math.cos(rotation) + target.z;
+		position.y = position.y + lift;
+		this.camera.lookAt(target.x, target.y, target.z);
 	}
 
 	private adjustCursor(): void {
