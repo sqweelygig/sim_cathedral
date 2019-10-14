@@ -8,8 +8,8 @@ export interface PerspectiveProps {
 }
 
 export class Perspective extends React.Component<PerspectiveProps> {
-	private static throttle(n: number): number {
-		return Math.min(Math.max(n, -0.01), 0.01);
+	private static throttle(n: number, limit = 0.01): number {
+		return Math.min(Math.max(n, -Math.abs(limit)), Math.abs(limit));
 	}
 
 	private mount: HTMLDivElement;
@@ -169,7 +169,7 @@ export class Perspective extends React.Component<PerspectiveProps> {
 		this.sun.position.z = this.sun.position.y;
 	}
 
-	private rotateCamera(rightNow = new Date().getTime()): void {
+	private adjustCamera(rightNow = new Date().getTime()): void {
 		const rotation = (2 * Math.PI * rightNow) / (20 * 1e3);
 		const target = this.cameraTarget;
 		const position = this.camera.position;
@@ -203,7 +203,7 @@ export class Perspective extends React.Component<PerspectiveProps> {
 	private animationLoop(): void {
 		const rightNow = new Date().getTime();
 		this.adjustLighting(rightNow);
-		this.rotateCamera(rightNow);
+		this.adjustCamera(rightNow);
 		this.adjustCursor();
 		this.renderer.render(this.scene, this.camera);
 	}
