@@ -30,7 +30,7 @@ export class Perspective extends React.Component<PerspectiveProps> {
 		y: 0,
 		z: 0,
 	};
-	private longestAxis = 0;
+	private furthestDistance = 0;
 	private cameraDistance = 1;
 	private readonly cameraTarget = {
 		x: 0,
@@ -131,8 +131,21 @@ export class Perspective extends React.Component<PerspectiveProps> {
 		this.centre.x = (max.x + min.x) / 2;
 		this.centre.z = (max.z + min.z) / 2;
 		this.centre.y = (max.y + min.y) / 2;
+		this.furthestDistance = this.renderedCubes.reduce((previous, cube) => {
+			const offset = {
+				x: Math.abs(cube.position.x - this.centre.x) + 0.5,
+				y: Math.abs(cube.position.y - this.centre.y) + 0.5,
+				z: Math.abs(cube.position.z - this.centre.z) + 0.5,
+			};
+			const squares = {
+				x: Math.pow(offset.x, 2),
+				y: Math.pow(offset.y, 2),
+				z: Math.pow(offset.z, 2),
+			};
+			const distance = Math.sqrt(squares.x + squares.y + squares.z);
+			return Math.max(distance, previous);
+		}, 0);
 		this.cathedralHeight = max.y;
-		this.longestAxis = Math.max(max.x - min.x, max.z - min.z, max.y - min.y);
 	}
 
 	private onMouseMove(event: MouseEvent) {
@@ -171,7 +184,7 @@ export class Perspective extends React.Component<PerspectiveProps> {
 		target.y += Perspective.throttle(this.centre.y - target.y, 0.01);
 		target.z += Perspective.throttle(this.centre.z - target.z, 0.01);
 		const distance = this.cameraDistance;
-		const zoom = this.longestAxis - distance;
+		const zoom = 1.7 * this.furthestDistance - distance;
 		this.cameraDistance += Perspective.throttle(zoom, 0.01);
 		position.x = this.cameraDistance * Math.sin(rotation) + target.x;
 		position.z = this.cameraDistance * Math.cos(rotation) + target.z;
