@@ -24,7 +24,6 @@ export class Perspective extends React.Component<PerspectiveProps> {
 		new Three.MeshBasicMaterial({ color: 0x0000ff, wireframe: true }),
 	);
 	private renderedCubes: Three.Mesh[] = [];
-	private nextFrame: number;
 	private readonly max = {
 		x: 0,
 		y: 0,
@@ -49,12 +48,10 @@ export class Perspective extends React.Component<PerspectiveProps> {
 	};
 
 	public componentDidMount(): void {
-		this.configureRender();
 		this.setScene();
 		this.lightScene();
 		this.updateCubes();
-		this.initialiseAnimation();
-		this.mount.appendChild(this.renderer.domElement);
+		this.configureRender();
 	}
 
 	public componentDidUpdate(): void {
@@ -62,7 +59,7 @@ export class Perspective extends React.Component<PerspectiveProps> {
 	}
 
 	public componentWillUnmount(): void {
-		cancelAnimationFrame(this.nextFrame);
+		this.renderer.setAnimationLoop(null);
 		this.mount.removeChild(this.renderer.domElement);
 	}
 
@@ -84,6 +81,8 @@ export class Perspective extends React.Component<PerspectiveProps> {
 		this.camera.position.y = 1.25;
 		this.renderer.shadowMap.enabled = true;
 		this.renderer.setSize(width, height);
+		this.renderer.setAnimationLoop(this.animationLoop.bind(this));
+		this.mount.appendChild(this.renderer.domElement);
 	}
 
 	private lightScene(): void {
@@ -201,14 +200,11 @@ export class Perspective extends React.Component<PerspectiveProps> {
 		}
 	}
 
-	private initialiseAnimation(): void {
+	private animationLoop(): void {
 		const rightNow = new Date().getTime();
 		this.adjustLighting(rightNow);
 		this.rotateCamera(rightNow);
 		this.adjustCursor();
 		this.renderer.render(this.scene, this.camera);
-		this.nextFrame = window.requestAnimationFrame(
-			this.initialiseAnimation.bind(this),
-		);
 	}
 }
