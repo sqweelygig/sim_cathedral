@@ -91,7 +91,7 @@ export class Perspective extends React.Component<PerspectiveProps> {
 	private setScene(): void {
 		this.scene.background = new Three.Color(0x5588aa);
 		const grass = new Three.Mesh(
-			new Three.CircleGeometry(32, 64),
+			new Three.CircleGeometry(32, 256),
 			new Three.MeshLambertMaterial({
 				color: 0x008800,
 			}),
