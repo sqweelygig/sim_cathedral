@@ -10,25 +10,33 @@ export interface PerspectiveProps {
 export class Perspective extends React.Component<PerspectiveProps> {
 	private mount: HTMLDivElement;
 	private camera: Three.PerspectiveCamera;
-	private readonly scene: Three.Scene = new Three.Scene();
-	private readonly renderer: Three.WebGLRenderer = new Three.WebGLRenderer();
-	private readonly sun: Three.DirectionalLight = new Three.DirectionalLight(
-		0xaa7755,
-	);
-	private readonly mouse: Three.Vector2 = new Three.Vector2();
+	private readonly scene = new Three.Scene();
+	private readonly renderer = new Three.WebGLRenderer();
+	private readonly sun = new Three.DirectionalLight(0xaa7755);
+	private readonly mouse = new Three.Vector2();
 	private readonly mouseRay = new Three.Raycaster();
-	private readonly cursor: Three.Mesh = new Three.Mesh(
+	private readonly cursor = new Three.Mesh(
 		new Three.BoxGeometry(1, 1, 1),
 		new Three.MeshBasicMaterial({ color: 0x0000ff, wireframe: true }),
 	);
 	private renderedCubes: Three.Mesh[] = [];
 	private nextFrame: number;
-	private maxX: number = 0;
-	private maxY: number = 0;
-	private maxZ: number = 0;
-	private minX: number = 0;
-	private minY: number = 0;
-	private minZ: number = 0;
+	private readonly max = {
+		x: 0,
+		y: 0,
+		z: 0,
+	};
+	private readonly min = {
+		x: 0,
+		y: 0,
+		z: 0,
+	};
+	private readonly centre = {
+		x: 0,
+		y: 0,
+		z: 0,
+	};
+	private longestAxis = 0;
 
 	public componentDidMount(): void {
 		this.configureRender();
@@ -99,12 +107,12 @@ export class Perspective extends React.Component<PerspectiveProps> {
 					color: cubeToRender.type.colour,
 				}),
 			);
-			this.maxX = Math.max(this.maxX, cubeToRender.location.east + 0.5);
-			this.minX = Math.min(this.minX, cubeToRender.location.east - 0.5);
-			this.maxZ = Math.max(this.maxZ, cubeToRender.location.south + 0.5);
-			this.minZ = Math.min(this.minZ, cubeToRender.location.south - 0.5);
-			this.maxY = Math.max(this.maxY, cubeToRender.location.up + 1);
-			this.minY = Math.min(this.minY, cubeToRender.location.up);
+			this.max.x = Math.max(this.max.x, cubeToRender.location.east + 0.5);
+			this.max.z = Math.max(this.max.z, cubeToRender.location.south + 0.5);
+			this.min.x = Math.min(this.min.x, cubeToRender.location.east - 0.5);
+			this.min.z = Math.min(this.min.z, cubeToRender.location.south - 0.5);
+			this.max.y = Math.max(this.max.y, cubeToRender.location.up + 1);
+			this.min.y = Math.min(this.min.y, cubeToRender.location.up);
 			renderedCube.position.y = cubeToRender.location.up + 0.5;
 			renderedCube.position.x = cubeToRender.location.east;
 			renderedCube.position.z = cubeToRender.location.south;
@@ -113,6 +121,14 @@ export class Perspective extends React.Component<PerspectiveProps> {
 			this.scene.add(renderedCube);
 			return renderedCube;
 		});
+		this.centre.x = (this.max.x + this.min.x) / 2;
+		this.centre.z = (this.max.z + this.min.z) / 2;
+		this.centre.y = (this.max.y + this.min.y) / 2;
+		this.longestAxis = Math.max(
+			this.max.x - this.min.x,
+			this.max.z - this.min.z,
+			this.max.y - this.min.y,
+		);
 	}
 
 	private onMouseMove(event: MouseEvent) {
@@ -134,7 +150,7 @@ export class Perspective extends React.Component<PerspectiveProps> {
 		}
 	}
 
-	private adjustLighting(rightNow: number = new Date().getTime()): void {
+	private adjustLighting(rightNow = new Date().getTime()): void {
 		const perDay = 60 * 60 * 24 * 1000;
 		const sinceMidnight = rightNow % perDay;
 		const solarTheta = (sinceMidnight * 2 * Math.PI) / perDay;
@@ -143,20 +159,14 @@ export class Perspective extends React.Component<PerspectiveProps> {
 		this.sun.position.z = this.sun.position.y;
 	}
 
-	private adjustCamera(rightNow: number = new Date().getTime()): void {
-		const cameraDistance = Math.max(
-			this.maxX - this.minX,
-			this.maxZ - this.minZ,
-			this.maxY - this.minY,
-		);
-		const centreX = (this.maxX + this.minX) / 2;
-		const centreY = (this.maxY + this.minY) / 2;
-		const centreZ = (this.maxZ + this.minZ) / 2;
-		const cameraTheta = rightNow / 4000;
-		this.camera.position.x = cameraDistance * Math.sin(cameraTheta) + centreX;
-		this.camera.position.y = this.maxY + 0.25;
-		this.camera.position.z = cameraDistance * Math.cos(cameraTheta) + centreZ;
-		this.camera.lookAt(centreX, centreY, centreZ);
+	private rotateCamera(rightNow = new Date().getTime()): void {
+		const rotation = rightNow / 4000;
+		const distance = this.longestAxis;
+		const centre = this.centre;
+		this.camera.position.x = distance * Math.sin(rotation) + centre.x;
+		this.camera.position.z = distance * Math.cos(rotation) + centre.z;
+		this.camera.position.y = this.max.y + 0.25;
+		this.camera.lookAt(centre.x, centre.y, centre.z);
 	}
 
 	private adjustCursor(): void {
@@ -177,7 +187,7 @@ export class Perspective extends React.Component<PerspectiveProps> {
 	private initialiseAnimation(): void {
 		const rightNow = new Date().getTime();
 		this.adjustLighting(rightNow);
-		this.adjustCamera(rightNow);
+		this.rotateCamera(rightNow);
 		this.adjustCursor();
 		this.renderer.render(this.scene, this.camera);
 		this.nextFrame = window.requestAnimationFrame(
