@@ -58,9 +58,7 @@ export class Perspective extends React.Component<PerspectiveProps> {
 		return (
 			<div
 				style={{ width: "100vw", height: "100vh" }}
-				ref={this.setMount.bind(this)}
-				onMouseMove={this.onMouseMove.bind(this)}
-				onClick={this.onMouseClick.bind(this)}
+				ref={this.makeMountSetter()}
 			/>
 		);
 	}
@@ -68,8 +66,10 @@ export class Perspective extends React.Component<PerspectiveProps> {
 	private configureRender(): void {
 		this.camera.position.y = 1.25;
 		this.renderer.shadowMap.enabled = true;
-		this.renderer.setAnimationLoop(this.animationLoop.bind(this));
+		this.renderer.setAnimationLoop(this.makeAnimator());
 		this.mount.appendChild(this.renderer.domElement);
+		this.renderer.domElement.onmousemove = this.makeMoveHandler();
+		this.renderer.domElement.onmouseup = this.makeClickHandler();
 	}
 
 	private lightScene(): void {
@@ -148,29 +148,35 @@ export class Perspective extends React.Component<PerspectiveProps> {
 		this.cathedralHeight = max.y;
 	}
 
-	private onMouseMove(event: MouseEvent) {
-		this.mouse.x = (event.clientX / this.getMountSize()) * 2 - 1;
-		this.mouse.y = -(event.clientY / this.getMountSize()) * 2 + 1;
+	private makeMoveHandler(): (event: MouseEvent) => void {
+		return (event: MouseEvent) => {
+			this.mouse.x = (event.clientX / this.getMountSize()) * 2 - 1;
+			this.mouse.y = -(event.clientY / this.getMountSize()) * 2 + 1;
+		};
 	}
 
-	private getMountSize() {
+	private getMountSize(): number {
 		const height = this.mount.clientHeight;
 		const width = this.mount.clientWidth;
 		return Math.min(height, width);
 	}
 
-	private onMouseClick() {
-		this.props.addCube({
-			east: this.cursor.position.x,
-			south: this.cursor.position.z,
-			up: this.cursor.position.y - 0.5,
-		});
+	private makeClickHandler(): () => void {
+		return () => {
+			this.props.addCube({
+				east: this.cursor.position.x,
+				south: this.cursor.position.z,
+				up: this.cursor.position.y - 0.5,
+			});
+		};
 	}
 
-	private setMount(mount: HTMLDivElement | null): void {
-		if (mount) {
-			this.mount = mount;
-		}
+	private makeMountSetter(): (mount: HTMLDivElement | null) => void {
+		return (mount: HTMLDivElement | null) => {
+			if (mount) {
+				this.mount = mount;
+			}
+		};
 	}
 
 	private adjustLighting(rightNow = new Date().getTime()): void {
@@ -216,11 +222,13 @@ export class Perspective extends React.Component<PerspectiveProps> {
 		}
 	}
 
-	private animationLoop(): void {
-		const rightNow = new Date().getTime();
-		this.adjustLighting(rightNow);
-		this.adjustCamera(rightNow);
-		this.adjustCursor();
-		this.renderer.render(this.scene, this.camera);
+	private makeAnimator(): () => void {
+		return () => {
+			const rightNow = new Date().getTime();
+			this.adjustLighting(rightNow);
+			this.adjustCamera(rightNow);
+			this.adjustCursor();
+			this.renderer.render(this.scene, this.camera);
+		};
 	}
 }
