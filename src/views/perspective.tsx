@@ -191,13 +191,12 @@ export class Perspective extends React.Component<PerspectiveProps> {
 		target.z += Perspective.throttle(this.centre.z - target.z, 0.01);
 		const distance = this.cameraDistance;
 		const zoom = 1.7 * this.furthestDistance - distance;
+		const justAboveCathedral = 1.3 * this.cathedralHeight;
+		const cameraHeight = Math.max(this.furthestDistance, justAboveCathedral);
 		this.cameraDistance += Perspective.throttle(zoom, 0.01);
 		position.x = this.cameraDistance * Math.sin(rotation) + target.x;
 		position.z = this.cameraDistance * Math.cos(rotation) + target.z;
-		position.y += Perspective.throttle(
-			0.25 + this.cathedralHeight - position.y,
-			0.01,
-		);
+		position.y += Perspective.throttle(cameraHeight - position.y, 0.01);
 		this.camera.lookAt(target.x, target.y, target.z);
 		this.renderer.setSize(this.getMountSize(), this.getMountSize());
 	}
