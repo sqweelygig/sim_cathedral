@@ -40,6 +40,14 @@ class Game extends React.Component<{}, GameState> {
 					},
 					type: simpleAltar,
 				},
+				{
+					location: {
+						east: -1,
+						south: 0,
+						up: 0,
+					},
+					type: simpleNave,
+				},
 			],
 		};
 	}
