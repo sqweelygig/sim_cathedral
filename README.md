@@ -7,6 +7,8 @@ The current choice is for the English Christian Church from late Saxon to curren
 The purpose of this project is the intersection of:
  * Personal interest in the gamification and education sectors
  * Displays and maintains my skills across the web development stack
+ 
+![Two cubes with a wireframe on top](docs/screenshot-2019-10-08.png)
 
 Thoughts
 --
