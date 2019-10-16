@@ -143,15 +143,20 @@ export class Perspective extends React.Component<PerspectiveProps> {
 
 	private makeMoveHandler(): (event: MouseEvent) => void {
 		return (event: MouseEvent) => {
-			this.mouse.x = (event.clientX / this.getMountSize()) * 2 - 1;
-			this.mouse.y = -(event.clientY / this.getMountSize()) * 2 + 1;
+			this.mouse.x = (event.clientX / this.getClientSize()) * 2 - 1;
+			this.mouse.y = -(event.clientY / this.getClientSize()) * 2 + 1;
 		};
 	}
 
-	private getMountSize(): number {
-		const height = this.mount.clientHeight;
-		const width = this.mount.clientWidth;
-		return Math.min(height, width);
+	private getClientSize(): number {
+		// TODO: This should really be handled by the tier above this passing down desired dimensions, but for now...
+		if (this.renderer.domElement.parentElement) {
+			const height = this.renderer.domElement.parentElement.clientHeight;
+			const width = this.renderer.domElement.parentElement.clientWidth;
+			return Math.min(height, width);
+		} else {
+			return 1;
+		}
 	}
 
 	private makeClickHandler(): () => void {
@@ -197,7 +202,7 @@ export class Perspective extends React.Component<PerspectiveProps> {
 		position.z = this.cameraDistance * Math.cos(rotation) + target.z;
 		position.y += Perspective.throttle(cameraHeight - position.y, 0.01);
 		this.camera.lookAt(target.x, target.y, target.z);
-		this.renderer.setSize(this.getMountSize(), this.getMountSize());
+		this.renderer.setSize(this.getClientSize(), this.getClientSize());
 	}
 
 	private adjustCursor(): void {
