@@ -3,8 +3,9 @@ import * as Three from "three";
 import { Cube, Location } from "../controllers/game";
 
 export interface PerspectiveProps {
-	cubes: Cube[];
 	addCube: (location: Location) => void;
+	cubes: Cube[];
+	style: React.CSSProperties;
 }
 
 export class Perspective extends React.Component<PerspectiveProps> {
@@ -24,7 +25,6 @@ export class Perspective extends React.Component<PerspectiveProps> {
 		new Three.MeshBasicMaterial({ color: 0x0000ff, wireframe: true }),
 	);
 	private renderedCubes: Three.Mesh[] = [];
-	private cathedralHeight = 0;
 	private readonly centre = {
 		x: 0,
 		y: 0,
@@ -40,7 +40,6 @@ export class Perspective extends React.Component<PerspectiveProps> {
 
 	public componentDidMount(): void {
 		this.setScene();
-		this.lightScene();
 		this.updateCubes();
 		this.configureRender();
 	}
@@ -55,12 +54,7 @@ export class Perspective extends React.Component<PerspectiveProps> {
 	}
 
 	public render(): React.ReactElement {
-		return (
-			<div
-				style={{ width: "100vw", height: "100vh" }}
-				ref={this.makeMountSetter()}
-			/>
-		);
+		return <div style={this.props.style} ref={this.makeMountSetter()} />;
 	}
 
 	private configureRender(): void {
@@ -70,13 +64,6 @@ export class Perspective extends React.Component<PerspectiveProps> {
 		this.mount.appendChild(this.renderer.domElement);
 		this.renderer.domElement.onmousemove = this.makeMoveHandler();
 		this.renderer.domElement.onmouseup = this.makeClickHandler();
-	}
-
-	private lightScene(): void {
-		const glow = new Three.AmbientLight(0x5588aa);
-		this.scene.add(glow);
-		this.sun.castShadow = true;
-		this.scene.add(this.sun);
 	}
 
 	private setScene(): void {
@@ -90,6 +77,10 @@ export class Perspective extends React.Component<PerspectiveProps> {
 		grass.rotateX(-Math.PI / 2);
 		grass.receiveShadow = true;
 		this.scene.add(grass);
+		const glow = new Three.AmbientLight(0x5588aa);
+		this.scene.add(glow);
+		this.sun.castShadow = true;
+		this.scene.add(this.sun);
 	}
 
 	private updateCubes(): void {
@@ -119,7 +110,6 @@ export class Perspective extends React.Component<PerspectiveProps> {
 			min.x = Math.min(min.x, cubeToRender.location.east - 0.5);
 			min.z = Math.min(min.z, cubeToRender.location.south - 0.5);
 			max.y = Math.max(max.y, cubeToRender.location.up + 1);
-			min.y = Math.min(min.y, cubeToRender.location.up);
 			renderedCube.position.y = cubeToRender.location.up + 0.5;
 			renderedCube.position.x = cubeToRender.location.east;
 			renderedCube.position.z = cubeToRender.location.south;
@@ -130,7 +120,7 @@ export class Perspective extends React.Component<PerspectiveProps> {
 		});
 		this.centre.x = (max.x + min.x) / 2;
 		this.centre.z = (max.z + min.z) / 2;
-		this.centre.y = (max.y + min.y) / 2;
+		this.centre.y = max.y / 2;
 		this.furthestDistance = this.renderedCubes.reduce((previous, cube) => {
 			const offset = {
 				x: Math.abs(cube.position.x - this.centre.x) + 0.5,
@@ -145,20 +135,13 @@ export class Perspective extends React.Component<PerspectiveProps> {
 			const distance = Math.sqrt(squares.x + squares.y + squares.z);
 			return Math.max(distance, previous);
 		}, 0);
-		this.cathedralHeight = max.y;
 	}
 
 	private makeMoveHandler(): (event: MouseEvent) => void {
 		return (event: MouseEvent) => {
-			this.mouse.x = (event.clientX / this.getMountSize()) * 2 - 1;
-			this.mouse.y = -(event.clientY / this.getMountSize()) * 2 + 1;
+			this.mouse.x = (event.clientX / this.mount.clientWidth) * 2 - 1;
+			this.mouse.y = -(event.clientY / this.mount.clientHeight) * 2 + 1;
 		};
-	}
-
-	private getMountSize(): number {
-		const height = this.mount.clientHeight;
-		const width = this.mount.clientWidth;
-		return Math.min(height, width);
 	}
 
 	private makeClickHandler(): () => void {
@@ -197,14 +180,17 @@ export class Perspective extends React.Component<PerspectiveProps> {
 		target.z += Perspective.throttle(this.centre.z - target.z, 0.01);
 		const distance = this.cameraDistance;
 		const zoom = 1.7 * this.furthestDistance - distance;
-		const justAboveCathedral = 1.3 * this.cathedralHeight;
+		const justAboveCathedral = 2.5 * this.centre.y;
 		const cameraHeight = Math.max(this.furthestDistance, justAboveCathedral);
 		this.cameraDistance += Perspective.throttle(zoom, 0.01);
 		position.x = this.cameraDistance * Math.sin(rotation) + target.x;
 		position.z = this.cameraDistance * Math.cos(rotation) + target.z;
 		position.y += Perspective.throttle(cameraHeight - position.y, 0.01);
 		this.camera.lookAt(target.x, target.y, target.z);
-		this.renderer.setSize(this.getMountSize(), this.getMountSize());
+		const width = this.mount.clientWidth;
+		const height = this.mount.clientHeight;
+		this.renderer.setSize(width, height);
+		this.camera.aspect = width / height;
 	}
 
 	private adjustCursor(): void {
