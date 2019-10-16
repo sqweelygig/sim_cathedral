@@ -24,7 +24,6 @@ export class Perspective extends React.Component<PerspectiveProps> {
 		new Three.MeshBasicMaterial({ color: 0x0000ff, wireframe: true }),
 	);
 	private renderedCubes: Three.Mesh[] = [];
-	private cathedralHeight = 0;
 	private readonly centre = {
 		x: 0,
 		y: 0,
@@ -119,7 +118,6 @@ export class Perspective extends React.Component<PerspectiveProps> {
 			min.x = Math.min(min.x, cubeToRender.location.east - 0.5);
 			min.z = Math.min(min.z, cubeToRender.location.south - 0.5);
 			max.y = Math.max(max.y, cubeToRender.location.up + 1);
-			min.y = Math.min(min.y, cubeToRender.location.up);
 			renderedCube.position.y = cubeToRender.location.up + 0.5;
 			renderedCube.position.x = cubeToRender.location.east;
 			renderedCube.position.z = cubeToRender.location.south;
@@ -130,7 +128,7 @@ export class Perspective extends React.Component<PerspectiveProps> {
 		});
 		this.centre.x = (max.x + min.x) / 2;
 		this.centre.z = (max.z + min.z) / 2;
-		this.centre.y = (max.y + min.y) / 2;
+		this.centre.y = max.y / 2;
 		this.furthestDistance = this.renderedCubes.reduce((previous, cube) => {
 			const offset = {
 				x: Math.abs(cube.position.x - this.centre.x) + 0.5,
@@ -145,7 +143,6 @@ export class Perspective extends React.Component<PerspectiveProps> {
 			const distance = Math.sqrt(squares.x + squares.y + squares.z);
 			return Math.max(distance, previous);
 		}, 0);
-		this.cathedralHeight = max.y;
 	}
 
 	private makeMoveHandler(): (event: MouseEvent) => void {
@@ -197,7 +194,7 @@ export class Perspective extends React.Component<PerspectiveProps> {
 		target.z += Perspective.throttle(this.centre.z - target.z, 0.01);
 		const distance = this.cameraDistance;
 		const zoom = 1.7 * this.furthestDistance - distance;
-		const justAboveCathedral = 1.3 * this.cathedralHeight;
+		const justAboveCathedral = 2.5 * this.centre.y;
 		const cameraHeight = Math.max(this.furthestDistance, justAboveCathedral);
 		this.cameraDistance += Perspective.throttle(zoom, 0.01);
 		position.x = this.cameraDistance * Math.sin(rotation) + target.x;
