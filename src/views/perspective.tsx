@@ -39,7 +39,6 @@ export class Perspective extends React.Component<PerspectiveProps> {
 
 	public componentDidMount(): void {
 		this.setScene();
-		this.lightScene();
 		this.updateCubes();
 		this.configureRender();
 	}
@@ -71,13 +70,6 @@ export class Perspective extends React.Component<PerspectiveProps> {
 		this.renderer.domElement.onmouseup = this.makeClickHandler();
 	}
 
-	private lightScene(): void {
-		const glow = new Three.AmbientLight(0x5588aa);
-		this.scene.add(glow);
-		this.sun.castShadow = true;
-		this.scene.add(this.sun);
-	}
-
 	private setScene(): void {
 		this.scene.background = new Three.Color(0x5588aa);
 		const grass = new Three.Mesh(
@@ -89,6 +81,10 @@ export class Perspective extends React.Component<PerspectiveProps> {
 		grass.rotateX(-Math.PI / 2);
 		grass.receiveShadow = true;
 		this.scene.add(grass);
+		const glow = new Three.AmbientLight(0x5588aa);
+		this.scene.add(glow);
+		this.sun.castShadow = true;
+		this.scene.add(this.sun);
 	}
 
 	private updateCubes(): void {
