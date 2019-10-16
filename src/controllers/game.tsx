@@ -54,7 +54,11 @@ class Game extends React.Component<{}, GameState> {
 
 	public render(): React.ReactElement {
 		return (
-			<Perspective cubes={this.state.cubes} addCube={this.addCube.bind(this)} />
+			<Perspective
+				cubes={this.state.cubes}
+				addCube={this.addCube.bind(this)}
+				style={{ width: "100vw", height: "100vh" }}
+			/>
 		);
 	}
 

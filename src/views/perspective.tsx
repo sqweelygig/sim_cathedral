@@ -3,8 +3,9 @@ import * as Three from "three";
 import { Cube, Location } from "../controllers/game";
 
 export interface PerspectiveProps {
-	cubes: Cube[];
 	addCube: (location: Location) => void;
+	cubes: Cube[];
+	style: React.CSSProperties;
 }
 
 export class Perspective extends React.Component<PerspectiveProps> {
@@ -53,12 +54,7 @@ export class Perspective extends React.Component<PerspectiveProps> {
 	}
 
 	public render(): React.ReactElement {
-		return (
-			<div
-				style={{ width: "100vw", height: "100vh" }}
-				ref={this.makeMountSetter()}
-			/>
-		);
+		return <div style={this.props.style} ref={this.makeMountSetter()} />;
 	}
 
 	private configureRender(): void {
@@ -143,20 +139,9 @@ export class Perspective extends React.Component<PerspectiveProps> {
 
 	private makeMoveHandler(): (event: MouseEvent) => void {
 		return (event: MouseEvent) => {
-			this.mouse.x = (event.clientX / this.getClientSize()) * 2 - 1;
-			this.mouse.y = -(event.clientY / this.getClientSize()) * 2 + 1;
+			this.mouse.x = (event.clientX / this.mount.clientWidth) * 2 - 1;
+			this.mouse.y = -(event.clientY / this.mount.clientHeight) * 2 + 1;
 		};
-	}
-
-	private getClientSize(): number {
-		// TODO: This should really be handled by the tier above this passing down desired dimensions, but for now...
-		if (this.renderer.domElement.parentElement) {
-			const height = this.renderer.domElement.parentElement.clientHeight;
-			const width = this.renderer.domElement.parentElement.clientWidth;
-			return Math.min(height, width);
-		} else {
-			return 1;
-		}
 	}
 
 	private makeClickHandler(): () => void {
@@ -202,7 +187,11 @@ export class Perspective extends React.Component<PerspectiveProps> {
 		position.z = this.cameraDistance * Math.cos(rotation) + target.z;
 		position.y += Perspective.throttle(cameraHeight - position.y, 0.01);
 		this.camera.lookAt(target.x, target.y, target.z);
-		this.renderer.setSize(this.getClientSize(), this.getClientSize());
+		const width = this.mount.clientWidth;
+		const height = this.mount.clientHeight;
+		this.renderer.setSize(width, height);
+		this.camera.aspect = width / height;
+		this.camera.updateProjectionMatrix();
 	}
 
 	private adjustCursor(): void {
