@@ -1,5 +1,6 @@
 import * as React from "react";
 import * as ReactDOM from "react-dom";
+import { Dialogue } from "../views/dialogue";
 import { Perspective } from "../views/perspective";
 import { Toolbar } from "../views/toolbar";
 
@@ -58,9 +59,16 @@ class Game extends React.Component<{}, GameState> {
 			<Perspective
 				cubes={this.state.cubes}
 				addCube={this.addCube.bind(this)}
-				style={{ width: "100vw", height: "100vh" }}
+				extraClasses={["layer fill"]}
 			/>,
-			<Toolbar />,
+			<div className={"layer with-toolbar"}>
+				<Toolbar />
+				<Dialogue
+					header="Miracle"
+					text="First choice, founding miracle"
+					options={[]}
+				/>
+			</div>,
 		];
 	}
 

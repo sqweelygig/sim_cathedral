@@ -5,7 +5,7 @@ import { Cube, Location } from "../controllers/game";
 export interface PerspectiveProps {
 	addCube: (location: Location) => void;
 	cubes: Cube[];
-	style: React.CSSProperties;
+	extraClasses?: string[];
 }
 
 export class Perspective extends React.Component<PerspectiveProps> {
@@ -54,7 +54,9 @@ export class Perspective extends React.Component<PerspectiveProps> {
 	}
 
 	public render(): React.ReactElement {
-		return <div style={this.props.style} ref={this.makeMountSetter()} />;
+		const extraClasses = this.props.extraClasses || [];
+		const className = extraClasses.concat(["perspective"]).join(" ");
+		return <div className={className} ref={this.makeMountSetter()} />;
 	}
 
 	private configureRender(): void {
