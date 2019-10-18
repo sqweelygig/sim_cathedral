@@ -1,6 +1,7 @@
 import * as React from "react";
 import * as ReactDOM from "react-dom";
 import { Perspective } from "../views/perspective";
+import { Toolbar } from "../views/toolbar";
 
 export interface Location {
 	east: number;
@@ -52,14 +53,15 @@ class Game extends React.Component<{}, GameState> {
 		};
 	}
 
-	public render(): React.ReactElement {
-		return (
+	public render(): React.ReactElement[] {
+		return [
 			<Perspective
 				cubes={this.state.cubes}
 				addCube={this.addCube.bind(this)}
 				style={{ width: "100vw", height: "100vh" }}
-			/>
-		);
+			/>,
+			<Toolbar />,
+		];
 	}
 
 	private addCube(location: Location): void {
