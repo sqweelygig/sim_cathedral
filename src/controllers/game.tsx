@@ -29,11 +29,7 @@ const simpleNave = { colour: 0x444400, label: "Simple Nave" };
 
 const simpleAltar = { colour: 0x442200, label: "Simple Altar" };
 
-const exampleDialogue = {
-	header: "Miracle",
-	options: ["water", "healing"],
-	text: "First choice, founding miracle, blah, blah, blah.",
-};
+const exampleDialogue = {};
 
 class Game extends React.Component<{}, GameState> {
 	constructor(props: {}) {
@@ -58,7 +54,17 @@ class Game extends React.Component<{}, GameState> {
 					type: simpleNave,
 				},
 			],
-			openDialogue: exampleDialogue,
+			openDialogue: {
+				actions: {
+					close: this.makeDialogueCloser(),
+					select: (selection: number) => {
+						console.log("selected", selection);
+					},
+				},
+				header: "Miracle",
+				options: ["water", "healing"],
+				text: "First choice, founding miracle, blah, blah, blah.",
+			},
 		};
 	}
 
@@ -77,6 +83,14 @@ class Game extends React.Component<{}, GameState> {
 				{dialogue}
 			</div>,
 		];
+	}
+
+	private makeDialogueCloser(): () => void {
+		return () => {
+			this.setState({
+				openDialogue: undefined,
+			});
+		};
 	}
 
 	private addCube(location: Location): void {
