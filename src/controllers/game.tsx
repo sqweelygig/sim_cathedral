@@ -1,6 +1,6 @@
 import * as React from "react";
 import * as ReactDOM from "react-dom";
-import { Dialogue } from "../views/dialogue";
+import { Dialogue, DialogueProps } from "../views/dialogue";
 import { Perspective } from "../views/perspective";
 import { Toolbar } from "../views/toolbar";
 
@@ -22,11 +22,18 @@ interface CubeType {
 
 interface GameState {
 	cubes: Cube[];
+	openDialogue?: DialogueProps;
 }
 
 const simpleNave = { colour: 0x444400, label: "Simple Nave" };
 
 const simpleAltar = { colour: 0x442200, label: "Simple Altar" };
+
+const exampleDialogue = {
+	header: "Miracle",
+	options: ["water", "healing"],
+	text: "First choice, founding miracle, blah, blah, blah.",
+};
 
 class Game extends React.Component<{}, GameState> {
 	constructor(props: {}) {
@@ -51,23 +58,23 @@ class Game extends React.Component<{}, GameState> {
 					type: simpleNave,
 				},
 			],
+			openDialogue: exampleDialogue,
 		};
 	}
 
 	public render(): React.ReactElement[] {
+		const dialogue = this.state.openDialogue
+			? Dialogue(this.state.openDialogue)
+			: null;
 		return [
 			<Perspective
 				cubes={this.state.cubes}
 				addCube={this.addCube.bind(this)}
-				extraClasses={["layer fill"]}
+				extraClasses={["layer"]}
 			/>,
 			<div className={"layer with-toolbar"}>
 				<Toolbar />
-				<Dialogue
-					header="Miracle"
-					text="First choice, founding miracle"
-					options={[]}
-				/>
+				{dialogue}
 			</div>,
 		];
 	}

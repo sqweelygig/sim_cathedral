@@ -55,7 +55,7 @@ export class Perspective extends React.Component<PerspectiveProps> {
 
 	public render(): React.ReactElement {
 		const extraClasses = this.props.extraClasses || [];
-		const className = extraClasses.concat(["perspective"]).join(" ");
+		const className = extraClasses.concat(["perspective", "fill"]).join(" ");
 		return <div className={className} ref={this.makeMountSetter()} />;
 	}
 
