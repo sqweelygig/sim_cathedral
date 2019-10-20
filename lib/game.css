@@ -5,9 +5,11 @@ body {
 	padding: 0;
 }
 body > .layer {
+	position: absolute;
+}
+body > .layer.fill {
 	width: 100vw;
 	height: 100vh;
-	position: absolute;
 }
 body > .layer.fill > :only-child {
 	width: 100%;

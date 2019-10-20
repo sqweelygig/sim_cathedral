@@ -29,8 +29,6 @@ const simpleNave = { colour: 0x444400, label: "Simple Nave" };
 
 const simpleAltar = { colour: 0x442200, label: "Simple Altar" };
 
-const exampleDialogue = {};
-
 class Game extends React.Component<{}, GameState> {
 	constructor(props: {}) {
 		super(props);
@@ -56,10 +54,8 @@ class Game extends React.Component<{}, GameState> {
 			],
 			openDialogue: {
 				actions: {
-					close: this.makeDialogueCloser(),
-					select: (selection: number) => {
-						console.log("selected", selection);
-					},
+					close: this.encloseDialogueCloser(),
+					select: this.encloseDialogueCloser(),
 				},
 				header: "Miracle",
 				options: ["water", "healing"],
@@ -75,7 +71,7 @@ class Game extends React.Component<{}, GameState> {
 		return [
 			<Perspective
 				cubes={this.state.cubes}
-				addCube={this.addCube.bind(this)}
+				addCube={this.encloseCubeAdder()}
 				extraClasses={["layer"]}
 			/>,
 			<div className={"layer with-toolbar"}>
@@ -85,7 +81,7 @@ class Game extends React.Component<{}, GameState> {
 		];
 	}
 
-	private makeDialogueCloser(): () => void {
+	private encloseDialogueCloser(): () => void {
 		return () => {
 			this.setState({
 				openDialogue: undefined,
@@ -93,11 +89,12 @@ class Game extends React.Component<{}, GameState> {
 		};
 	}
 
-	private addCube(location: Location): void {
-		const cubes = this.state.cubes.concat([{ location, type: simpleNave }]);
-		this.setState({
-			cubes,
-		});
+	private encloseCubeAdder(): (location: Location) => void {
+		return (location: Location) => {
+			this.setState((state) => ({
+				cubes: state.cubes.concat([{ location, type: simpleNave }]),
+			}));
+		};
 	}
 }
 
