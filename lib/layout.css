@@ -1,8 +1,5 @@
 body {
-	background: black;
-	color: white;
 	margin: 0;
-	padding: 0;
 }
 body > .layer {
 	position: absolute;
@@ -26,6 +23,5 @@ body > .layer.with-toolbar > .toolbar {
 }
 body > .layer.with-toolbar > .dialogue {
 	grid-area: dialogue;
-	border: 1px black solid;
 	margin: 2em;
 }

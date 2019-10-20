@@ -1,0 +1,40 @@
+.dialogue {
+	border: 1px black solid;
+	font-family: cursive;
+	padding: 2em;
+	display: grid;
+	grid-template-areas:
+		"title close"
+		"text text"
+		"choice .";
+	grid-template-columns: 1fr 3em;
+	color: black;
+	background: bisque;
+}
+.dialogue > .title {
+	font-family: "UnifrakturMaguntia", cursive;
+	font-size: 4em;
+	grid-area: title;
+	margin-top: 0;
+}
+.dialogue > .close {
+	width: 100%;
+	grid-area: close;
+	justify-self: end;
+	align-self: start;
+}
+.dialogue > .choice {
+	grid-area: choice;
+	display: flex;
+	list-style-type: none;
+	padding-inline-start: 0;
+	flex-wrap: wrap;
+	justify-content: space-evenly;
+}
+.dialogue > .choice > * {
+	padding: 1em;
+	background: rgba(128, 128, 128, 0.2);
+}
+.dialogue > .text {
+	grid-area: text;
+}

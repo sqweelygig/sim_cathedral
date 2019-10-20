@@ -1,8 +1,8 @@
 import * as React from "react";
 import * as ReactDOM from "react-dom";
-import { Dialogue, DialogueProps } from "../views/dialogue";
-import { Perspective } from "../views/perspective";
-import { Toolbar } from "../views/toolbar";
+import { Dialogue, DialogueProps } from "../elements/dialogue";
+import { Perspective } from "../elements/perspective";
+import { Toolbar } from "../elements/toolbar";
 
 export interface Location {
 	east: number;
@@ -57,9 +57,10 @@ class Game extends React.Component<{}, GameState> {
 					close: this.encloseDialogueCloser(),
 					select: this.encloseDialogueCloser(),
 				},
-				header: "Miracle",
+				header: "Miracle!",
 				options: ["water", "healing"],
-				text: "First choice, founding miracle, blah, blah, blah.",
+				text:
+					"The earliest part of a cathedral's story, a miracle committed on the very location.  This will alter how you cathedral is viewed throughout history, and give options that other cathedrals may not.",
 			},
 		};
 	}

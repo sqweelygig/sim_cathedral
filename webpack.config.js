@@ -26,7 +26,7 @@ module.exports = {
 	},
 	plugins: [
 		new Copy([
-			{ from: Path.join("lib", "*.png"), to: "[name].png" },
+			{ from: Path.join("lib", "icons", "*.png"), to: Path.join("icons", "[name].png") },
 			{ from: Path.join("lib", "*.html"), to: "[name].html" },
 			{ from: Path.join("lib", "*.css"), to: "[name].css" },
 		]),

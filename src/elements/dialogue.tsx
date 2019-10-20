@@ -26,10 +26,15 @@ export function Dialogue(props: DialogueProps): React.ReactElement {
 	});
 	return (
 		<div className={className}>
-			<h1>{props.header}</h1>
-			<h2 onClick={props.actions.close}>Close</h2>
-			<p>{props.text}</p>
-			<ul>{listItems}</ul>
+			<h1 className="title">{props.header}</h1>
+			<img
+				src={"icons/waxseal.png"}
+				alt="wax seal"
+				className="close"
+				onClick={props.actions.close}
+			/>
+			<div className="text">{props.text}</div>
+			<ul className="choice">{listItems}</ul>
 		</div>
 	);
 }
