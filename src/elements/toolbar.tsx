@@ -7,5 +7,5 @@ export interface ToolbarProps {
 export function Toolbar(props: ToolbarProps): React.ReactElement {
 	const extraClasses = props.extraClasses || [];
 	const className = extraClasses.concat(["toolbar"]).join(" ");
-	return <div className={className}>Toolbar here</div>;
+	return <div className={className} />;
 }
