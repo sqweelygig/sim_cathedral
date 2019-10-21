@@ -2,16 +2,18 @@
 	"name": "ex_cathedra",
 	"version": "0.0.1",
 	"description": "",
-	"main": "./dist/game.html",
+	"main": "./server/build/main.js",
 	"scripts": {
-		"build": "npm run build_clear && npm run build_run",
-		"build_clear": "rm -rf ./dist",
-		"build_run": "./node_modules/webpack/bin/webpack.js",
-		"iterate": "npm run lint && npm run build",
+		"build": "npm run build_clear && npm run build_client && npm run build_server",
+		"build_clear": "rm -rf ./client/build && rm -rf ./server/build",
+		"build_client": "./node_modules/webpack/bin/webpack.js --config client/webpack.config.js",
+		"build_server": "tsc -p server/tsconfig.json",
+		"iterate": "npm run lint && npm run build && npm start",
 		"lint": "npm run lint_tslint && npm run lint_prettier",
-		"lint_prettier": "./node_modules/prettier/bin-prettier.js src/**/* --check --write",
-		"lint_tslint": "./node_modules/tslint/bin/tslint src/**/*.{ts,tsx} --fix --force",
+		"lint_prettier": "./node_modules/prettier/bin-prettier.js {client,server}/source/**/* --check --write",
+		"lint_tslint": "./node_modules/tslint/bin/tslint {client,server}/source/**/*.{ts,tsx} --fix --force",
 		"postinstall": "npm run build",
+		"start": "node .",
 		"test": "echo \"Error: no test specified\" && exit 1"
 	},
 	"engines": {
@@ -21,6 +23,7 @@
 	"author": "Andrew Lucas",
 	"private": true,
 	"devDependencies": {
+		"@types/express": "^4.17.1",
 		"@types/lodash": "^4.14.144",
 		"@types/node": "^12.7.9",
 		"@types/react": "^16.9.4",
@@ -41,6 +44,7 @@
 		"webpack-cli": "^3.3.9"
 	},
 	"dependencies": {
+		"express": "^4.17.1",
 		"lodash": "^4.17.15",
 		"react": "^16.10.1",
 		"react-dom": "^16.10.1",

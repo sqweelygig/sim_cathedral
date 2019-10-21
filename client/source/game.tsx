@@ -1,25 +1,10 @@
 import { Dictionary } from "lodash";
 import * as React from "react";
 import * as ReactDOM from "react-dom";
-import { Dialogue, DialogueProps } from "../elements/dialogue";
-import { Perspective } from "../elements/perspective";
-import { Toolbar } from "../elements/toolbar";
-
-export interface Location {
-	east: number;
-	south: number;
-	up: number;
-}
-
-export interface Cube {
-	location: Location;
-	type: CubeType;
-}
-
-interface CubeType {
-	colour: number;
-	label: string;
-}
+import { Dialogue, DialogueProps } from "./elements/dialogue";
+import { Perspective } from "./elements/perspective";
+import { Toolbar } from "./elements/toolbar";
+import { Cube, Location } from "./types/matrix";
 
 interface GameState {
 	cubes: Cube[];

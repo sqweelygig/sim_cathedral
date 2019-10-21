@@ -3,3 +3,5 @@
 sim_cathedral.iml
 dist/
 node_modules/
+client/build/
+server/build/
