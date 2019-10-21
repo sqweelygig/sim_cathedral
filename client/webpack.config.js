@@ -3,7 +3,7 @@ const Copy = require("copy-webpack-plugin");
 
 module.exports = {
 	entry: {
-		game: Path.join(__dirname, "source", "controllers", "game.tsx"),
+		game: Path.join(__dirname, "source", "game.tsx"),
 	},
 	mode: "development",
 	module: {

@@ -1,6 +1,6 @@
 import * as React from "react";
 import * as Three from "three";
-import { Cube, Location } from "../controllers/game";
+import { Cube, Location } from "../types/matrix";
 
 export interface PerspectiveProps {
 	addCube: (location: Location) => void;
