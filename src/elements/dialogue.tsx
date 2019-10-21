@@ -3,7 +3,7 @@ import * as React from "react";
 export interface DialogueProps {
 	actions: {
 		close: () => void;
-		select: (selection: number) => void;
+		select: (selection: string) => void;
 	};
 	extraClasses?: string[];
 	header: string;
@@ -14,12 +14,12 @@ export interface DialogueProps {
 export function Dialogue(props: DialogueProps): React.ReactElement {
 	const extraClasses = props.extraClasses || [];
 	const className = extraClasses.concat(["dialogue"]).join(" ");
-	const listItems = props.options.map((option, index) => {
+	const listItems = props.options.map((option) => {
 		const selectThis = () => {
-			props.actions.select(index);
+			props.actions.select(option);
 		};
 		return (
-			<li key={index} onClick={selectThis}>
+			<li key={option} onClick={selectThis}>
 				{option}
 			</li>
 		);

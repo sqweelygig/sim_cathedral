@@ -1,3 +1,4 @@
+import { Dictionary } from "lodash";
 import * as React from "react";
 import * as ReactDOM from "react-dom";
 import { Dialogue, DialogueProps } from "../elements/dialogue";
@@ -22,6 +23,7 @@ interface CubeType {
 
 interface GameState {
 	cubes: Cube[];
+	decisions: Dictionary<string>;
 	openDialogue?: DialogueProps;
 }
 
@@ -52,10 +54,11 @@ class Game extends React.Component<{}, GameState> {
 					type: simpleNave,
 				},
 			],
+			decisions: {},
 			openDialogue: {
 				actions: {
 					close: this.encloseDialogueCloser(),
-					select: this.encloseDialogueCloser(),
+					select: this.encloseDecisionSelector("miracle"),
 				},
 				header: "Miracle!",
 				options: ["water", "healing"],
@@ -87,6 +90,19 @@ class Game extends React.Component<{}, GameState> {
 			this.setState({
 				openDialogue: undefined,
 			});
+		};
+	}
+
+	private encloseDecisionSelector(
+		decision: string,
+	): (selection: string) => void {
+		return (selection: string) => {
+			const merge: Dictionary<string> = {};
+			merge[decision] = selection;
+			this.setState((state) => ({
+				decisions: { ...state.decisions, ...merge },
+				openDialogue: undefined,
+			}));
 		};
 	}
 
