@@ -9,16 +9,11 @@
 		"moduleResolution": "node",
 		"noImplicitAny": true,
 		"noImplicitReturns": true,
-		"outDir": "dist",
 		"preserveConstEnums": false,
 		"removeComments": true,
 		"resolveJsonModule": true,
-		"rootDir": "src",
 		"sourceMap": false,
 		"strictNullChecks": true,
 		"target": "es6"
-	},
-	"include": [
-		"src/**/*"
-	]
+	}
 }

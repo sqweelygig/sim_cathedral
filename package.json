@@ -5,12 +5,12 @@
 	"main": "./dist/game.html",
 	"scripts": {
 		"build": "npm run build_clear && npm run build_run",
-		"build_clear": "rm -rf ./dist",
+		"build_clear": "rm -rf ./client/build",
 		"build_run": "./node_modules/webpack/bin/webpack.js",
 		"iterate": "npm run lint && npm run build",
 		"lint": "npm run lint_tslint && npm run lint_prettier",
-		"lint_prettier": "./node_modules/prettier/bin-prettier.js src/**/* --check --write",
-		"lint_tslint": "./node_modules/tslint/bin/tslint src/**/*.{ts,tsx} --fix --force",
+		"lint_prettier": "./node_modules/prettier/bin-prettier.js client/source/**/* --check --write",
+		"lint_tslint": "./node_modules/tslint/bin/tslint client/source/**/*.{ts,tsx} --fix --force",
 		"postinstall": "npm run build",
 		"test": "echo \"Error: no test specified\" && exit 1"
 	},
