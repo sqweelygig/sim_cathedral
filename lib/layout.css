@@ -1,0 +1,27 @@
+body {
+	margin: 0;
+}
+body > .layer {
+	position: absolute;
+}
+body > .layer.fill {
+	width: 100vw;
+	height: 100vh;
+}
+body > .layer.fill > :only-child {
+	width: 100%;
+	height: 100%;
+}
+body > .layer.with-toolbar {
+	display: grid;
+	grid-template-areas: "toolbar dialogue";
+	grid-template-columns: 9em 1fr;
+}
+body > .layer.with-toolbar > .toolbar {
+	grid-area: toolbar;
+	margin: 2em;
+}
+body > .layer.with-toolbar > .dialogue {
+	grid-area: dialogue;
+	margin: 2em;
+}

@@ -21,6 +21,7 @@
 	"author": "Andrew Lucas",
 	"private": true,
 	"devDependencies": {
+		"@types/lodash": "^4.14.144",
 		"@types/node": "^12.7.9",
 		"@types/react": "^16.9.4",
 		"@types/react-dom": "^16.9.1",
@@ -40,6 +41,7 @@
 		"webpack-cli": "^3.3.9"
 	},
 	"dependencies": {
+		"lodash": "^4.17.15",
 		"react": "^16.10.1",
 		"react-dom": "^16.10.1",
 		"three": "^0.109.0",

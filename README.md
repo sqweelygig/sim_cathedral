@@ -8,7 +8,7 @@ The purpose of this project is the intersection of:
  * Personal interest in the gamification and education sectors
  * Displays and maintains my skills across the web development stack
  
-![Two cubes with a wireframe on top](docs/screenshot-2019-10-08.png)
+![A dialogue modal in vague olde-style with two cubes behind](docs/screenshot-2019-10-21.png)
 
 Thoughts
 --

@@ -12,21 +12,7 @@ module.exports = {
 				exclude: /node_modules/,
 				test: /\.tsx?$/,
 				use: "ts-loader",
-			},
-			{
-				test: /\.s?css$/,
-				use: [
-					{
-						loader: "style-loader", // Creates style nodes from JS strings
-					},
-					{
-						loader: "css-loader", // Translates CSS into CommonJS
-					},
-					{
-						loader: "sass-loader", // Compiles Sass to CSS
-					},
-				],
-			},
+			}
 		],
 	},
 	node: {
@@ -40,8 +26,9 @@ module.exports = {
 	},
 	plugins: [
 		new Copy([
-			{ from: Path.join("lib", "*.png"), to: "[name].png" },
-			{ from: Path.join("src", "*.html"), to: "[name].html" },
+			{ from: Path.join("lib", "icons", "*.png"), to: Path.join("icons", "[name].png") },
+			{ from: Path.join("lib", "*.html"), to: "[name].html" },
+			{ from: Path.join("lib", "*.css"), to: "[name].css" },
 		]),
 	],
 	resolve: {

@@ -1,6 +1,9 @@
+import { Dictionary } from "lodash";
 import * as React from "react";
 import * as ReactDOM from "react-dom";
-import { Perspective } from "../views/perspective";
+import { Dialogue, DialogueProps } from "../elements/dialogue";
+import { Perspective } from "../elements/perspective";
+import { Toolbar } from "../elements/toolbar";
 
 export interface Location {
 	east: number;
@@ -20,6 +23,8 @@ interface CubeType {
 
 interface GameState {
 	cubes: Cube[];
+	decisions: Dictionary<string>;
+	openDialogue?: DialogueProps;
 }
 
 const simpleNave = { colour: 0x444400, label: "Simple Nave" };
@@ -49,24 +54,65 @@ class Game extends React.Component<{}, GameState> {
 					type: simpleNave,
 				},
 			],
+			decisions: {},
+			openDialogue: {
+				actions: {
+					close: this.encloseDialogueCloser(),
+					select: this.encloseDecisionSelector("miracle"),
+				},
+				header: "Miracle!",
+				options: ["water", "healing"],
+				text:
+					"The earliest part of a cathedral's story, a miracle committed on the very location.  This will alter how you cathedral is viewed throughout history, and give options that other cathedrals may not.",
+			},
 		};
 	}
 
-	public render(): React.ReactElement {
-		return (
+	public render(): React.ReactElement[] {
+		const dialogue = this.state.openDialogue
+			? Dialogue(this.state.openDialogue)
+			: null;
+		return [
 			<Perspective
 				cubes={this.state.cubes}
-				addCube={this.addCube.bind(this)}
-				style={{ width: "100vw", height: "100vh" }}
-			/>
-		);
+				addCube={this.encloseCubeAdder()}
+				extraClasses={["layer"]}
+				key="render-layer"
+			/>,
+			<div className={"layer with-toolbar"} key="interface-layer">
+				<Toolbar />
+				{dialogue}
+			</div>,
+		];
 	}
 
-	private addCube(location: Location): void {
-		const cubes = this.state.cubes.concat([{ location, type: simpleNave }]);
-		this.setState({
-			cubes,
-		});
+	private encloseDialogueCloser(): () => void {
+		return () => {
+			this.setState({
+				openDialogue: undefined,
+			});
+		};
+	}
+
+	private encloseDecisionSelector(
+		decision: string,
+	): (selection: string) => void {
+		return (selection: string) => {
+			const merge: Dictionary<string> = {};
+			merge[decision] = selection;
+			this.setState((state) => ({
+				decisions: { ...state.decisions, ...merge },
+				openDialogue: undefined,
+			}));
+		};
+	}
+
+	private encloseCubeAdder(): (location: Location) => void {
+		return (location: Location) => {
+			this.setState((state) => ({
+				cubes: state.cubes.concat([{ location, type: simpleNave }]),
+			}));
+		};
 	}
 }
 
