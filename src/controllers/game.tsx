@@ -77,8 +77,9 @@ class Game extends React.Component<{}, GameState> {
 				cubes={this.state.cubes}
 				addCube={this.encloseCubeAdder()}
 				extraClasses={["layer"]}
+				key="render-layer"
 			/>,
-			<div className={"layer with-toolbar"}>
+			<div className={"layer with-toolbar"} key="interface-layer">
 				<Toolbar />
 				{dialogue}
 			</div>,
