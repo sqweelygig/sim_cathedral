@@ -1,5 +1,4 @@
 const Path = require("path");
-const Copy = require("copy-webpack-plugin");
 
 module.exports = {
 	entry: {
@@ -21,25 +20,9 @@ module.exports = {
 		tls: "empty",
 	},
 	output: {
-		path: Path.join(__dirname, "build"),
+		path: Path.join(__dirname, "distribute", "source"),
 		filename: "[name].js",
 	},
-	plugins: [
-		new Copy([
-			{
-				from: Path.join(__dirname, "library", "icons", "*.png"),
-				to: Path.join(__dirname, "build", "icons", "[name].png"),
-			},
-			{
-				from: Path.join(__dirname, "library", "*.html"),
-				to: Path.join(__dirname, "build", "[name].html"),
-			},
-			{
-				from: Path.join(__dirname, "library", "*.css"),
-				to: Path.join(__dirname, "build", "[name].css"),
-			},
-		]),
-	],
 	resolve: {
 		extensions: [".ts", ".tsx", ".js"],
 	},

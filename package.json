@@ -5,7 +5,7 @@
 	"main": "./server/build/main.js",
 	"scripts": {
 		"build": "npm run build_clear && npm run build_client && npm run build_server",
-		"build_clear": "rm -rf ./client/build && rm -rf ./server/build",
+		"build_clear": "rm -rf ./client/distribute/source && rm -rf ./server/build",
 		"build_client": "./node_modules/webpack/bin/webpack.js --config client/webpack.config.js",
 		"build_server": "tsc -p server/tsconfig.json",
 		"iterate": "npm run lint && npm run build && npm start",

@@ -1,7 +1,9 @@
 
+.DS_Store
 .idea/
 sim_cathedral.iml
 dist/
 node_modules/
 client/build/
 server/build/
+client/distribute/source/
