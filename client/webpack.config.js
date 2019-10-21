@@ -27,11 +27,17 @@ module.exports = {
 	plugins: [
 		new Copy([
 			{
-				from: Path.join("library", "icons", "*.png"),
-				to: Path.join("icons", "[name].png"),
+				from: Path.join(__dirname, "library", "icons", "*.png"),
+				to: Path.join(__dirname, "build", "icons", "[name].png"),
 			},
-			{ from: Path.join("library", "*.html"), to: "[name].html" },
-			{ from: Path.join("library", "*.css"), to: "[name].css" },
+			{
+				from: Path.join(__dirname, "library", "*.html"),
+				to: Path.join(__dirname, "build", "[name].html"),
+			},
+			{
+				from: Path.join(__dirname, "library", "*.css"),
+				to: Path.join(__dirname, "build", "[name].css"),
+			},
 		]),
 	],
 	resolve: {
