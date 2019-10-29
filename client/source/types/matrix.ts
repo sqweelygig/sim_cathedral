@@ -1,3 +1,9 @@
+interface Color {
+	red: number;
+	green: number;
+	blue: number;
+}
+
 export interface Location {
 	east: number;
 	south: number;
@@ -10,6 +16,6 @@ export interface Cube {
 }
 
 interface CubeType {
-	colour: number;
+	colour: Color;
 	label: string;
 }

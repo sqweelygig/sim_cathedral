@@ -104,7 +104,11 @@ export class Perspective extends React.Component<PerspectiveProps> {
 			const renderedCube = new Three.Mesh(
 				new Three.BoxGeometry(1, 1, 1),
 				new Three.MeshLambertMaterial({
-					color: cubeToRender.type.colour,
+					color: new Three.Color(
+						cubeToRender.type.colour.red / 0xff,
+						cubeToRender.type.colour.green / 0xff,
+						cubeToRender.type.colour.blue / 0xff,
+					),
 				}),
 			);
 			max.x = Math.max(max.x, cubeToRender.location.east + 0.5);

@@ -12,9 +12,15 @@ interface GameState {
 	openDialogue?: DialogueProps;
 }
 
-const simpleNave = { colour: 0x444400, label: "Simple Nave" };
+const simpleNave = {
+	colour: { red: 0x44, green: 0x44, blue: 0x00 },
+	label: "Simple Nave",
+};
 
-const simpleAltar = { colour: 0x442200, label: "Simple Altar" };
+const simpleAltar = {
+	colour: { red: 0x44, green: 0x22, blue: 0x00 },
+	label: "Simple Altar",
+};
 
 class Game extends React.Component<{}, GameState> {
 	constructor(props: {}) {
