@@ -44,7 +44,7 @@
 		"webpack-cli": "^3.3.9"
 	},
 	"dependencies": {
-		"express": "^4.17.1",
+		"express": "^4.17.3",
 		"lodash": "^4.17.15",
 		"react": "^16.10.1",
 		"react-dom": "^16.10.1",
